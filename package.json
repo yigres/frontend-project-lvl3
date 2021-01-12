@@ -25,7 +25,8 @@
     "raise-version": "^0.4.0",
     "style-loader": "^2.0.0",
     "webpack": "^5.12.2",
-    "webpack-cli": "^4.3.1"
+    "webpack-cli": "^4.3.1",
+    "webpack-dev-server": "^3.11.1"
   },
   "dependencies": {
     "@popperjs/core": "^2.6.0",
