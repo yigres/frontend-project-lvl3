@@ -1,3 +1,6 @@
+build:
+	npx webpack
+	
 install:
 	npm ci
 	
