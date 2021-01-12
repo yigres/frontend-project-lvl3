@@ -5,7 +5,7 @@ install:
 	npm ci
 
 build:
-	rm -rf dist
+	rm -rf dist &&
 	NODE_ENV=production npx webpack
 	
 lint:
