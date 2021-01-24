@@ -21,12 +21,14 @@ const state = {
 };
 
 const isFeedExist = (value) => {
-  for (const { url } of state.feeds) {
+  let result = false;
+  state.feeds.forEach(({ url }) => {
     if (url === value) {
-      return true;
+      result = true;
     }
-  }
-  return false;
+  });
+
+  return result;
 };
 
 const watchedState = onChange(state, (path, value) => {
