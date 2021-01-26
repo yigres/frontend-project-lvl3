@@ -1,8 +1,9 @@
 // import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
+// import _ from 'lodash';
+import view from './view.js';
 
-const onChange = require('on-change');
 // const axios = require('axios');
 
 const state = {
@@ -14,7 +15,7 @@ const state = {
     },
   },
   rss: {
-    state: null, // Rss has been loaded, Must be valid url, Rss already exists
+    state: null, // Rss has been loaded / Must be valid url / Rss already exists
   },
   feeds: [],
   posts: [],
@@ -31,43 +32,56 @@ const isFeedExist = (value) => {
   return result;
 };
 
-const watchedState = onChange(state, (path, value) => {
-  console.log(path);
-  console.log(value);
-  console.log(state.form.state.url);
-  const borderElement = document.querySelector('input');
-  if (watchedState.form.state.valid === false) {
-    borderElement.classList.add('is-invalid');
-  }
-  if (watchedState.form.state.valid === true) {
-    borderElement.classList.remove('is-invalid');
-    borderElement.value = '';
-  }
-  if (path === 'form.state.status') {
-    console.log(value);
-    console.log('Ooops!');
-    const feedbackEl = document.querySelector('.feedback');
-    feedbackEl.classList.add('text-danger');
-  }
-});
+const watchedState = view(state);
+
+const parser = (data, url, oldFeeds, oldPosts) => {
+  const feeds = JSON.parse(JSON.stringify(oldFeeds));
+  const posts = JSON.parse(JSON.stringify(oldPosts));
+  const dom = new DOMParser();
+  const doc = dom.parseFromString(data.contents, 'text/xml');
+  const feedName = doc.querySelector('title').textContent;
+  const feedDescription = doc.querySelector('description').textContent;
+  const feedId = oldFeeds.length + 1;
+  const items = doc.querySelectorAll('item');
+  let postId = 1;
+
+  items.forEach((item) => {
+    const name = item.querySelector('title').textContent;
+    const link = item.querySelector('link').textContent;
+    posts.push({
+      postId,
+      feedId,
+      name,
+      link,
+    });
+    postId += 1;
+  });
+  console.log(state.posts);
+
+  feeds.push({
+    feedId,
+    name: feedName,
+    description: feedDescription,
+    url,
+  });
+
+  return { feeds, posts };
+};
 
 const schema = yup.object().shape({
   website: yup.string().url(),
 });
 
 const form = document.querySelector('form');
-// console.log(form);
 
 form.addEventListener('submit', (e) => {
-  e.preventDefault();
   const url = form.querySelector('input').value;
+  e.preventDefault();
   if (isFeedExist(url)) {
     watchedState.form.state.valid = false;
     watchedState.form.state.status = 'Rss already exists';
   }
   if (!isFeedExist(url)) {
-    // console.log('Oooops!');
-
     schema
       .isValid({
         website: url,
@@ -90,19 +104,13 @@ form.addEventListener('submit', (e) => {
               throw new Error('Network response was not ok.');
             })
             .then((data) => {
-              const parser = new DOMParser();
-              const xmlDom = parser.parseFromString(data.contents, 'text/xml');
-
-              console.log(xmlDom.querySelector('title').textContent);
-              console.log(xmlDom.querySelector('description').textContent);
-              console.log(xmlDom.querySelectorAll('title'));
-              console.log(xmlDom);
-              const feedName = xmlDom.querySelector('title').textContent;
-              const feedDescription = xmlDom.querySelector('description').textContent;
-              state.feeds.push({ name: feedName, description: feedDescription, url });
-              console.log(state.feeds);
+              const { feeds, posts } = parser(data, url, state.feeds, state.posts);
+              state.posts = posts;
+              watchedState.feeds = feeds;
             });
         }
       });
   }
 });
+
+export default state;
