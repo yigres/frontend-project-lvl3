@@ -1,11 +1,7 @@
-// import 'bootstrap';
 import i18n from 'i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
-// import _ from 'lodash';
 import view from './view.js';
-
-// const axios = require('axios');
 
 const state = {
   form: {
@@ -31,7 +27,7 @@ const FeedExists = (value) => {
 };
 
 const watchedState = view(state);
-
+// ***************
 const parser = (data, url, oldFeeds, oldPosts) => {
   const clonedArray = (arr) => JSON.parse(JSON.stringify(arr));
 
@@ -43,7 +39,7 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   const feedDescription = doc.querySelector('description').textContent;
   const feedId = oldFeeds.length + 1;
   const items = doc.querySelectorAll('item');
-  let postId = 1;
+  let postId = oldPosts.length + 1;
 
   items.forEach((item) => {
     const name = item.querySelector('title').textContent;
@@ -56,7 +52,6 @@ const parser = (data, url, oldFeeds, oldPosts) => {
     });
     postId += 1;
   });
-  console.log(state.posts);
 
   feeds.push({
     feedId,
@@ -66,6 +61,42 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   });
 
   return { feeds, posts };
+};
+// ***************
+const checkFeeds = (timerId) => {
+  console.log(timerId);
+  state.feeds.forEach((feed) => {
+    fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feed.url)}`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok.');
+      })
+      .then((data) => {
+        const { posts } = parser(data, feed.url, [], []);
+        const newPosts = posts.map((newPost) => ({ name: newPost.name, link: newPost.link }));
+        const oldPostUrls = state.posts
+          .filter((postValue) => postValue.feedId === feed.feedId)
+          .map((postValue) => postValue.link);
+        newPosts.forEach((newPost) => {
+          if (oldPostUrls.indexOf(newPost.link) === (-1)) {
+            const postId = state.posts.length + 1;
+            watchedState.posts.unshift({
+              postId,
+              feedId: feed.feedId,
+              name: newPost.name,
+              link: newPost.link,
+            });
+            // console.log(state.posts);
+          }
+        });
+      })
+      .catch((er) => {
+        console.error('Something went wrong with response');
+        console.error(er);
+      });
+  });
 };
 
 const schema = yup.object().shape({
@@ -113,7 +144,7 @@ i18n.init({
             if (valid === true) {
               form.querySelector('input').value = '';
               watchedState.form.state.valid = true;
-              fetch(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}`)
+              fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
                 .then((response) => {
                   if (response.ok) {
                     watchedState.form.state.status = i18n.t('form.status.loaded');
@@ -125,6 +156,7 @@ i18n.init({
                   const { feeds, posts } = parser(data, url, state.feeds, state.posts);
                   state.posts = posts;
                   watchedState.feeds = feeds;
+                  // console.log(state.posts);
                 })
                 .catch((er) => {
                   console.error('Something went wrong with response');
@@ -138,6 +170,11 @@ i18n.init({
           });
       }
     });
+
+    let timerId = setTimeout(function tick() {
+      timerId = setTimeout(tick, 5000);
+      checkFeeds(timerId);
+    }, 5000);
   })
   .catch((e) => {
     console.error('Something went wrong with i18next initialization');
