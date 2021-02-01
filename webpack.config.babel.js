@@ -1,26 +1,27 @@
-// const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-module.exports = {
+export default {
   // entry: './src/index.js',
   // output: {
   //   filename: 'bundle.js',
   //   path: path.resolve(__dirname, 'dist'),
   // },
   mode: process.env.NODE_ENV || 'development',
-  // module: {
-  //   rules: [
-  //     {
-  //       test: /\.js$/,
-  //       exclude: /node_modules/,
-  //       use: {
-  //         loader: 'babel-loader',
-  //       },
-  //     },
-  //   ],
-  // },
+  devtool: 'source-map',
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    port: process.env.PORT || 3000,
+  },
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
       {
         test: /\.css$/,
         use: [

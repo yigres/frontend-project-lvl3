@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "rss-reader",
   "scripts": {
+    "wds:dev": "cross-env NODE_ENV=development webpack serve --progress",
+    "wds": "cross-env NODE_ENV=production webpack serve --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,6 +18,11 @@
   },
   "homepage": "https://github.com/yigres/frontend-project-lvl3#readme",
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.12.10",
+    "babel-loader": "^8.2.2",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -24,8 +31,8 @@
     "raise-version": "^0.4.0",
     "style-loader": "^2.0.0",
     "webpack": "^5.12.2",
-    "webpack-cli": "^4.3.1",
-    "webpack-dev-server": "^3.11.1"
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
     "@popperjs/core": "^2.6.0",
