@@ -1,6 +1,8 @@
 import i18n from 'i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
+// import $ from 'jquery';
+// import * from 'bootstrap';
 import view from './view.js';
 
 const state = {
@@ -170,6 +172,7 @@ i18n.init({
           });
       }
     });
+    // document.addEventListener('submit', (e) => {
 
     let timerId = setTimeout(function tick() {
       timerId = setTimeout(tick, 5000);

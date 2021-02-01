@@ -34,6 +34,13 @@ const viewPosts = (state) => {
       linkEl.rel = 'noopener noreferrer';
       linkEl.textContent = post.name;
       postLiEl.append(linkEl);
+      const previewButton = document.createElement('button');
+      previewButton.type = 'button';
+      previewButton.classList.add('btn', 'btn-primary');
+      previewButton.dataset.toggle = 'modal';
+      previewButton.dataset.target = '#exampleModal';
+      previewButton.textContent = 'Preview';
+      postLiEl.append(previewButton);
       postsUlEl.prepend(postLiEl);
     });
 };
@@ -51,6 +58,13 @@ const viewNewPost = (state) => {
   linkEl.rel = 'noopener noreferrer';
   linkEl.textContent = name;
   postLiEl.append(linkEl);
+  const previewButton = document.createElement('button');
+  previewButton.type = 'button';
+  previewButton.classList.add('btn', 'btn-primary');
+  // previewButton.data-toggle = 'modal';
+  // previewButton.data-target = '#exampleModal';
+  previewButton.textContent = 'Preview';
+  postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);
 };
 
