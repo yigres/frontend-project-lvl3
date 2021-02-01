@@ -1,8 +1,9 @@
-import i18n from 'i18next';
+import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+import i18n from 'i18next';
 import * as yup from 'yup';
-// import $ from 'jquery';
-// import * from 'bootstrap';
+
 import view from './view.js';
 
 const state = {
