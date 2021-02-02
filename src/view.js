@@ -28,7 +28,7 @@ const viewPosts = (state) => {
       postLiEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
       const linkEl = document.createElement('a');
       linkEl.href = post.link;
-      linkEl.classList.add('font-weight-normal');
+      linkEl.classList.add('fw-bold');
       linkEl.target = '_blank';
       linkEl.dataset.id = post.postId;
       linkEl.rel = 'noopener noreferrer';
@@ -37,8 +37,9 @@ const viewPosts = (state) => {
       const previewButton = document.createElement('button');
       previewButton.type = 'button';
       previewButton.classList.add('btn', 'btn-primary');
+      previewButton.dataset.id = post.postId;
       previewButton.dataset.bsToggle = 'modal';
-      previewButton.dataset.bsTarget = '#exampleModal';
+      previewButton.dataset.bsTarget = '#previewModal';
       previewButton.textContent = 'Preview';
       postLiEl.append(previewButton);
       postsUlEl.prepend(postLiEl);
@@ -52,7 +53,7 @@ const viewNewPost = (state) => {
   const { postId, name, link } = state.posts[0];
   const linkEl = document.createElement('a');
   linkEl.href = link;
-  linkEl.classList.add('font-weight-normal');
+  linkEl.classList.add('fw-bold');
   linkEl.target = '_blank';
   linkEl.dataset.id = postId;
   linkEl.rel = 'noopener noreferrer';
@@ -61,8 +62,9 @@ const viewNewPost = (state) => {
   const previewButton = document.createElement('button');
   previewButton.type = 'button';
   previewButton.classList.add('btn', 'btn-primary');
-  previewButton.data.bsToggle = 'modal';
-  previewButton.data.bsTarget = '#exampleModal';
+  previewButton.dataset.id = postId;
+  previewButton.dataset.bsToggle = 'modal';
+  previewButton.dataset.bsTarget = '#previewModal';
   previewButton.textContent = 'Preview';
   postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);

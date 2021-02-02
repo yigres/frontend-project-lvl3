@@ -1,5 +1,6 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import $ from 'jquery';
 
 import i18n from 'i18next';
 import * as yup from 'yup';
@@ -46,12 +47,15 @@ const parser = (data, url, oldFeeds, oldPosts) => {
 
   items.forEach((item) => {
     const name = item.querySelector('title').textContent;
+    const description = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
     posts.push({
       postId,
       feedId,
       name,
+      description,
       link,
+      unread: true,
     });
     postId += 1;
   });
@@ -173,7 +177,19 @@ i18n.init({
           });
       }
     });
-    // document.addEventListener('submit', (e) => {
+
+    const modalEl = document.getElementById('previewModal');
+
+    modalEl.addEventListener('show.bs.modal', (event) => {
+      console.log(event);
+      const { id } = event.relatedTarget.dataset;
+      // console.log(id, event.relatedTarget);
+      const { name, description } = state.posts[id - 1];
+      // console.log(name);
+      const modal = event.target;
+      modal.querySelector('.modal-title').textContent = name;
+      modal.querySelector('.modal-body').textContent = description;
+    });
 
     let timerId = setTimeout(function tick() {
       timerId = setTimeout(tick, 5000);
