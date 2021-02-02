@@ -1,6 +1,5 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import $ from 'jquery';
 
 import i18n from 'i18next';
 import * as yup from 'yup';
