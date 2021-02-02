@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "rss-reader",
   "scripts": {
-    "dist": "cross-env NODE_ENV=production webpack --progress",
-    "dist:dev": "cross-env NODE_ENV=development webpack --progress",
-    "wds": "cross-env NODE_ENV=production webpack serve --progress",
-    "wds:dev": "cross-env NODE_ENV=development webpack serve --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

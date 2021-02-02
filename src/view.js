@@ -37,8 +37,8 @@ const viewPosts = (state) => {
       const previewButton = document.createElement('button');
       previewButton.type = 'button';
       previewButton.classList.add('btn', 'btn-primary');
-      previewButton.dataset.toggle = 'modal';
-      previewButton.dataset.target = '#exampleModal';
+      previewButton.dataset.bsToggle = 'modal';
+      previewButton.dataset.bsTarget = '#exampleModal';
       previewButton.textContent = 'Preview';
       postLiEl.append(previewButton);
       postsUlEl.prepend(postLiEl);
@@ -61,8 +61,8 @@ const viewNewPost = (state) => {
   const previewButton = document.createElement('button');
   previewButton.type = 'button';
   previewButton.classList.add('btn', 'btn-primary');
-  // previewButton.data-toggle = 'modal';
-  // previewButton.data-target = '#exampleModal';
+  previewButton.data.bsToggle = 'modal';
+  previewButton.data.bsTarget = '#exampleModal';
   previewButton.textContent = 'Preview';
   postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);

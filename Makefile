@@ -1,12 +1,12 @@
 develop:
-	npx webpack serve
+	npx cross-env NODE_ENV=development webpack serve --progress
 	
 install:
 	npm ci
 
 build:
-	rm -rf dist && NODE_ENV=production npx webpack
-	
+	rm -rf dist
+	npx cross-env NODE_ENV=production webpack --progress
 	
 lint:
 	npx eslint .
