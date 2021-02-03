@@ -17,12 +17,12 @@ const viewFeeds = (state) => {
   feedsUlEl.prepend(feedLiEl);
 };
 
-const viewPosts = (state) => {
+const viewPosts = (state, watchedState) => {
   const lastFeedIndex = state.feeds.length - 1;
   const postsUlEl = document.querySelector('.posts > ul');
   state.posts
     .filter(({ feedId }) => feedId === lastFeedIndex + 1)
-    .reverse()
+    // .reverse()
     .forEach((post) => {
       const postLiEl = document.createElement('li');
       postLiEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
@@ -43,14 +43,19 @@ const viewPosts = (state) => {
       previewButton.textContent = 'Preview';
       postLiEl.append(previewButton);
       postsUlEl.prepend(postLiEl);
+
+      linkEl.addEventListener('click', () => {
+        // const { id } = linkEl.dataset;
+        watchedState.posts[post.postId - 1].unread = false;
+      });
     });
 };
 
-const viewNewPost = (state) => {
+const viewNewPost = (state, watchedState) => {
   const postsUlEl = document.querySelector('.posts > ul');
   const postLiEl = document.createElement('li');
   postLiEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-  const { postId, name, link } = state.posts[0];
+  const { postId, name, link } = state.posts[state.posts.length - 1];
   const linkEl = document.createElement('a');
   linkEl.href = link;
   linkEl.classList.add('fw-bold');
@@ -68,10 +73,16 @@ const viewNewPost = (state) => {
   previewButton.textContent = 'Preview';
   postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);
+
+  linkEl.addEventListener('click', () => {
+    // const { id } = linkEl.dataset;
+    watchedState.posts[postId - 1].unread = false;
+  });
 };
 
 const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
+    console.log(state.posts);
     if (path === 'form.state.status') {
       const borderElement = document.querySelector('input');
       if (watchedState.form.state.valid === false) {
@@ -93,10 +104,19 @@ const view = (state) => {
     }
     if (path === 'feeds') {
       viewFeeds(state);
-      viewPosts(state);
+      viewPosts(state, watchedState);
     }
     if (path === 'posts') {
-      viewNewPost(state);
+      viewNewPost(state, watchedState);
+    }
+    if (path.slice(-6) === 'unread') {
+      const beginPos = 5;
+      const endPos = path.indexOf('.', 6);
+      const idValue = Number(path.slice(beginPos + 1, endPos)) + 1;
+      console.log(idValue);
+      const aEl = document.querySelector(`a[data-id='${idValue}']`);
+      aEl.classList.remove('fw-bold');
+      aEl.classList.add('fw-normal');
     }
   });
   return watchedState;

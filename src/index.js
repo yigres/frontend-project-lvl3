@@ -42,22 +42,22 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   const feedDescription = doc.querySelector('description').textContent;
   const feedId = oldFeeds.length + 1;
   const items = doc.querySelectorAll('item');
-  let postId = oldPosts.length + 1;
 
-  items.forEach((item) => {
+  for (let i = 1; i <= items.length; i += 1) {
+  // items.forEach((item) => {
+    const item = items[items.length - i];
     const name = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
     posts.push({
-      postId,
+      postId: oldPosts.length + i,
       feedId,
       name,
       description,
       link,
       unread: true,
     });
-    postId += 1;
-  });
+  }
 
   feeds.push({
     feedId,
@@ -69,8 +69,7 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   return { feeds, posts };
 };
 // ***************
-const checkFeeds = (timerId) => {
-  console.log(timerId);
+const checkFeeds = () => {
   state.feeds.forEach((feed) => {
     fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feed.url)}`)
       .then((response) => {
@@ -81,20 +80,25 @@ const checkFeeds = (timerId) => {
       })
       .then((data) => {
         const { posts } = parser(data, feed.url, [], []);
-        const newPosts = posts.map((newPost) => ({ name: newPost.name, link: newPost.link }));
+        const newPosts = posts.map((newPost) => ({
+          name: newPost.name,
+          description: newPost.description,
+          link: newPost.link,
+        }));
         const oldPostUrls = state.posts
           .filter((postValue) => postValue.feedId === feed.feedId)
           .map((postValue) => postValue.link);
         newPosts.forEach((newPost) => {
           if (oldPostUrls.indexOf(newPost.link) === (-1)) {
             const postId = state.posts.length + 1;
-            watchedState.posts.unshift({
+            watchedState.posts.push({
               postId,
               feedId: feed.feedId,
               name: newPost.name,
+              description: newPost.description,
               link: newPost.link,
+              unread: true,
             });
-            // console.log(state.posts);
           }
         });
       })
@@ -180,19 +184,24 @@ i18n.init({
     const modalEl = document.getElementById('previewModal');
 
     modalEl.addEventListener('show.bs.modal', (event) => {
-      console.log(event);
       const { id } = event.relatedTarget.dataset;
-      // console.log(id, event.relatedTarget);
-      const { name, description } = state.posts[id - 1];
-      // console.log(name);
+      const {
+        name,
+        description,
+        link,
+      } = state.posts[id - 1];
       const modal = event.target;
       modal.querySelector('.modal-title').textContent = name;
       modal.querySelector('.modal-body').textContent = description;
+      modal.querySelector('div a').href = link;
+      console.log(id - 1, state.posts[id - 1].unread);
+      watchedState.posts[id - 1].unread = false;
+      console.log(id - 1, state.posts[id - 1].unread);
     });
 
-    let timerId = setTimeout(function tick() {
-      timerId = setTimeout(tick, 5000);
-      checkFeeds(timerId);
+    setTimeout(function tick() {
+      setTimeout(tick, 5000);
+      checkFeeds();
     }, 5000);
   })
   .catch((e) => {
