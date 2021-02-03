@@ -1,3 +1,5 @@
+/* eslint no-param-reassign:
+    ["error", { "props": true, "ignorePropertyModificationsFor": ["watchedState"] }] */
 const onChange = require('on-change');
 
 const viewFeeds = (state) => {
@@ -22,7 +24,6 @@ const viewPosts = (state, watchedState) => {
   const postsUlEl = document.querySelector('.posts > ul');
   state.posts
     .filter(({ feedId }) => feedId === lastFeedIndex + 1)
-    // .reverse()
     .forEach((post) => {
       const postLiEl = document.createElement('li');
       postLiEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
@@ -45,7 +46,6 @@ const viewPosts = (state, watchedState) => {
       postsUlEl.prepend(postLiEl);
 
       linkEl.addEventListener('click', () => {
-        // const { id } = linkEl.dataset;
         watchedState.posts[post.postId - 1].unread = false;
       });
     });
@@ -75,7 +75,6 @@ const viewNewPost = (state, watchedState) => {
   postsUlEl.prepend(postLiEl);
 
   linkEl.addEventListener('click', () => {
-    // const { id } = linkEl.dataset;
     watchedState.posts[postId - 1].unread = false;
   });
 };
