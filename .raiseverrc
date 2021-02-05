@@ -12,9 +12,9 @@
     "development": "main",
     "remote": "origin",
     "commit": true,
-    "merge": true,
+    "merge": false,
     "all": false,
     "tag": true,
-    "push": false
+    "push": true
   }
 }
