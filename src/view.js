@@ -101,6 +101,7 @@ const view = (state) => {
 
       if (value === 'Rss has been loaded') {
         const form = document.querySelector('form');
+
         form.querySelector('input').value = '';
         feedbackEl.classList.remove('text-danger');
         feedbackEl.classList.add('text-success');
@@ -108,7 +109,11 @@ const view = (state) => {
       if (value !== 'Rss has been loaded') {
         feedbackEl.classList.add('text-danger');
       }
+      console.log(value);
+      console.log(feedbackEl.textContent);
       feedbackEl.textContent = value;
+      console.log(value);
+      console.log(feedbackEl.textContent);
     }
     if (path === 'feeds') {
       viewFeeds(state);
