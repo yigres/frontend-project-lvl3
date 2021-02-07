@@ -79,11 +79,11 @@ const viewNewPost = (state, watchedState) => {
   });
 };
 
-const submit = document.querySelector('button[type=submit]');
-
 const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
     if (path === 'form.state.status') {
+      const submit = document.querySelector('button[type=submit]');
+
       if (value === 'loading...') {
         submit.disabled = true;
       } else {
