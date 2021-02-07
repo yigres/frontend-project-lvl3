@@ -100,9 +100,9 @@ const view = (state) => {
       const feedbackEl = document.querySelector('.feedback');
 
       if (value === 'Rss has been loaded') {
-        const form = document.querySelector('form');
+        // const form = document.querySelector('form');
 
-        form.querySelector('input').value = '';
+        // form.querySelector('input').value = '';
         feedbackEl.classList.remove('text-danger');
         feedbackEl.classList.add('text-success');
       }
