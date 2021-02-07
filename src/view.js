@@ -79,20 +79,29 @@ const viewNewPost = (state, watchedState) => {
   });
 };
 
+const submit = document.querySelector('button[type=submit]');
+
 const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
-    console.log(state.posts);
     if (path === 'form.state.status') {
+      if (value === 'loading...') {
+        submit.disabled = true;
+      } else {
+        submit.disabled = false;
+      }
+
       const borderElement = document.querySelector('input');
-      if (watchedState.form.state.valid === false) {
+      if (state.form.state.valid === false) {
         borderElement.classList.add('is-invalid');
       }
-      if (watchedState.form.state.valid === true) {
+      if (state.form.state.valid === true) {
         borderElement.classList.remove('is-invalid');
-        borderElement.value = '';
       }
       const feedbackEl = document.querySelector('.feedback');
+
       if (value === 'Rss has been loaded') {
+        const form = document.querySelector('form');
+        form.querySelector('input').value = '';
         feedbackEl.classList.remove('text-danger');
         feedbackEl.classList.add('text-success');
       }
@@ -112,7 +121,6 @@ const view = (state) => {
       const beginPos = 5;
       const endPos = path.indexOf('.', 6);
       const idValue = Number(path.slice(beginPos + 1, endPos)) + 1;
-      console.log(idValue);
       const aEl = document.querySelector(`a[data-id='${idValue}']`);
       aEl.classList.remove('fw-bold');
       aEl.classList.add('fw-normal');

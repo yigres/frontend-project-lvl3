@@ -1,3 +1,6 @@
+/* eslint no-param-reassign:
+    ["error", { "props": true, "ignorePropertyModificationsFor": ["watchedState"] }] */
+
 import i18n from 'i18next';
 import * as yup from 'yup';
 
@@ -26,7 +29,6 @@ const FeedExists = (value) => {
   return result;
 };
 
-// const watchedState = view(state);
 // ***************
 const parser = (data, url, oldFeeds, oldPosts) => {
   const clonedArray = (arr) => JSON.parse(JSON.stringify(arr));
@@ -41,7 +43,6 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   const items = doc.querySelectorAll('item');
 
   for (let i = 1; i <= items.length; i += 1) {
-  // items.forEach((item) => {
     const item = items[items.length - i];
     const name = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
@@ -99,9 +100,8 @@ const checkFeeds = (watchedState) => {
           }
         });
       })
-      .catch((er) => {
-        console.error('Something went wrong with response');
-        console.error(er);
+      .catch(() => {
+        watchedState.form.state.status = i18n.t('form.status.networkError');
       });
   });
 };
@@ -126,6 +126,10 @@ export default () => {
               loaded: 'Rss has been loaded',
               invalid: 'Must be valid url',
               duplicated: 'Rss already exists',
+              networkError: 'Network error or bad url',
+              validationError: 'Validation error',
+              i18nextError: 'Something went wrong with i18next initialization',
+              loading: 'loading...',
             },
           },
         },
@@ -134,6 +138,7 @@ export default () => {
   })
     .then(() => {
       form.addEventListener('submit', (e) => {
+        watchedState.form.state.status = i18n.t('form.status.loading');
         const url = form.querySelector('input').value;
         e.preventDefault();
         if (FeedExists(url)) {
@@ -148,35 +153,32 @@ export default () => {
             .then((valid) => {
               state.form.state.url = url;
               if (valid === false) {
-                watchedState.form.state.valid = false;
+                state.form.state.valid = false;
                 watchedState.form.state.status = i18n.t('form.status.invalid');
               }
               if (valid === true) {
-                form.querySelector('input').value = '';
-                watchedState.form.state.valid = true;
+                state.form.state.valid = true;
                 fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
                   .then((response) => {
                     if (response.ok) {
                       watchedState.form.state.status = i18n.t('form.status.loaded');
                       return response.json();
                     }
+
                     throw new Error('Network response was not ok.');
                   })
                   .then((data) => {
                     const { feeds, posts } = parser(data, url, state.feeds, state.posts);
                     state.posts = posts;
                     watchedState.feeds = feeds;
-                    // console.log(state.posts);
                   })
-                  .catch((er) => {
-                    console.error('Something went wrong with response');
-                    console.error(er);
+                  .catch(() => {
+                    watchedState.form.state.status = i18n.t('form.status.networkError');
                   });
               }
             })
-            .catch((error) => {
-              console.error('Something went wrong url validation');
-              console.error(error);
+            .catch(() => {
+              watchedState.form.state.status = i18n.t('form.status.validationError');
             });
         }
       });
@@ -194,9 +196,7 @@ export default () => {
         modal.querySelector('.modal-title').textContent = name;
         modal.querySelector('.modal-body').textContent = description;
         modal.querySelector('div a').href = link;
-        console.log(id - 1, state.posts[id - 1].unread);
         watchedState.posts[id - 1].unread = false;
-        console.log(id - 1, state.posts[id - 1].unread);
       });
 
       setTimeout(function tick() {
@@ -204,10 +204,7 @@ export default () => {
         checkFeeds(watchedState);
       }, 5000);
     })
-    .catch((e) => {
-      console.error('Something went wrong with i18next initialization');
-      console.error(e);
+    .catch(() => {
+      watchedState.form.state.status = i18n.t('form.status.i18nextError');
     });
 };
-
-// export default state;
