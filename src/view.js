@@ -81,6 +81,7 @@ const viewNewPost = (state, watchedState) => {
 
 const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
+
     if (path === 'form.state.status') {
       const submit = document.querySelector('button[type=submit]');
 
@@ -111,9 +112,11 @@ const view = (state) => {
       }
       console.log(value);
       console.log(feedbackEl.textContent);
-      feedbackEl.textContent = value;
-      console.log(value);
-      console.log(feedbackEl.textContent);
+      // feedbackEl.textContent = value;
+      const form = document.querySelector('form');
+      feedbackEl.textContent = form.querySelector('input').value;
+      // console.log(value);
+      // console.log(feedbackEl.textContent);
     }
     if (path === 'feeds') {
       viewFeeds(state);
