@@ -192,7 +192,8 @@ export default () => {
             })
             .catch((error) => {
               // watchedState.form.state.status = i18n.t('form.status.validationError');
-              watchedState.form.state.status = error.textContent;
+              const feedback = document.querySelector('feedback');
+              feedback.textContent = error.textContent;
             });
         }
       });
