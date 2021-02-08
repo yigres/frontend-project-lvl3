@@ -190,8 +190,9 @@ export default () => {
                   });
               }
             })
-            .catch(() => {
-              watchedState.form.state.status = i18n.t('form.status.validationError');
+            .catch((error) => {
+              // watchedState.form.state.status = i18n.t('form.status.validationError');
+              watchedState.form.state.status = error.textContent;
             });
         }
       });
