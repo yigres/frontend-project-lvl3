@@ -131,6 +131,7 @@ export default () => {
               networkError: 'Network error or bad url',
               validationError: 'Validation error',
               i18nextError: 'Something went wrong with i18next initialization',
+              nonRssUrl: 'This source doesn\'t contain valid rss', // This source doesn't contain valid rss
               loading: 'loading...',
             },
           },

@@ -37,6 +37,7 @@ const viewPosts = (state, watchedState) => {
       postLiEl.append(linkEl);
       const previewButton = document.createElement('button');
       previewButton.type = 'button';
+      previewButton.ariaLabel = 'preview';
       previewButton.classList.add('btn', 'btn-primary');
       previewButton.dataset.id = post.postId;
       previewButton.dataset.bsToggle = 'modal';
