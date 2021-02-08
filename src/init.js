@@ -141,14 +141,7 @@ export default () => {
     .then(() => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        watchedState.form.state.status = i18n.t('form.status.loading');
         const url = form.querySelector('input').value;
-        // schema
-        //   .isValid({
-        //     website: url,
-        //   })
-        //   .then((valid) => {
-        //   });
 
         if (FeedExists(url)) {
           watchedState.form.state.valid = false;
@@ -164,7 +157,6 @@ export default () => {
               check.textContent = valid;
               const urlEl = document.querySelector('.url');
               urlEl.textContent = url;
-              // console.log(valid);
 
               state.form.state.url = url;
               if (valid === false) {
@@ -173,6 +165,7 @@ export default () => {
               }
               if (valid === true) {
                 state.form.state.valid = true;
+                watchedState.form.state.status = i18n.t('form.status.loading');
                 fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
                   .then((response) => {
                     const responseEl = document.querySelector('.response');
