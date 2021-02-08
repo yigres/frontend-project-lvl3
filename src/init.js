@@ -142,6 +142,8 @@ export default () => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const url = form.querySelector('input').value;
+        const urlEl = document.querySelector('.url');
+        urlEl.textContent = url;
 
         if (FeedExists(url)) {
           watchedState.form.state.valid = false;
@@ -155,8 +157,6 @@ export default () => {
             .then((valid) => {
               const check = document.querySelector('.check');
               check.textContent = valid;
-              const urlEl = document.querySelector('.url');
-              urlEl.textContent = url;
 
               state.form.state.url = url;
               if (valid === false) {
