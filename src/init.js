@@ -142,17 +142,12 @@ export default () => {
         e.preventDefault();
         watchedState.form.state.status = i18n.t('form.status.loading');
         const url = form.querySelector('input').value;
-        schema
-          .isValid({
-            website: url,
-          })
-          .then((valid) => {
-            const check = document.querySelector('.check');
-            check.textContent = valid;
-            const urlEl = document.querySelector('.url');
-            urlEl.textContent = url;
-            // console.log(valid);
-          });
+        // schema
+        //   .isValid({
+        //     website: url,
+        //   })
+        //   .then((valid) => {
+        //   });
 
         if (FeedExists(url)) {
           watchedState.form.state.valid = false;
@@ -164,6 +159,12 @@ export default () => {
               website: url,
             })
             .then((valid) => {
+              const check = document.querySelector('.check');
+              check.textContent = valid;
+              const urlEl = document.querySelector('.url');
+              urlEl.textContent = url;
+              // console.log(valid);
+
               state.form.state.url = url;
               if (valid === false) {
                 state.form.state.valid = false;
@@ -173,6 +174,8 @@ export default () => {
                 state.form.state.valid = true;
                 fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
                   .then((response) => {
+                    const responseEl = document.querySelector('.response');
+                    responseEl.textContent = response.ok;
                     if (response.ok) {
                       watchedState.form.state.status = i18n.t('form.status.loaded');
                       return response.json();
@@ -181,11 +184,15 @@ export default () => {
                     throw new Error('Network response was not ok.');
                   })
                   .then((data) => {
+                    const dataEl = document.querySelector('.data');
+                    dataEl.textContent = data;
                     const { feeds, posts } = parser(data, url, state.feeds, state.posts);
                     state.posts = posts;
                     watchedState.feeds = feeds;
                   })
-                  .catch(() => {
+                  .catch((error) => {
+                    const catchEl = document.querySelector('.catch');
+                    catchEl.textContent = error.message;
                     watchedState.form.state.status = i18n.t('form.status.networkError');
                   });
               }
