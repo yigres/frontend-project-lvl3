@@ -112,6 +112,7 @@ export default () => {
   const schema = yup.object().shape({
     website: yup.string().url(),
   });
+  console.log(schema);
 
   const form = document.querySelector('form');
 
@@ -138,9 +139,21 @@ export default () => {
   })
     .then(() => {
       form.addEventListener('submit', (e) => {
+        e.preventDefault();
         watchedState.form.state.status = i18n.t('form.status.loading');
         const url = form.querySelector('input').value;
-        e.preventDefault();
+        schema
+          .isValid({
+            website: url,
+          })
+          .then((valid) => {
+            const check = document.querySelector('.check');
+            check.textContent = valid;
+            const urlEl = document.querySelector('.url');
+            urlEl.textContent = url;
+            // console.log(valid);
+          });
+
         if (FeedExists(url)) {
           watchedState.form.state.valid = false;
           watchedState.form.state.status = i18n.t('form.status.duplicated');

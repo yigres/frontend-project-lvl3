@@ -81,7 +81,6 @@ const viewNewPost = (state, watchedState) => {
 
 const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
-
     if (path === 'form.state.status') {
       const submit = document.querySelector('button[type=submit]');
 
