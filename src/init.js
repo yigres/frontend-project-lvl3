@@ -195,7 +195,9 @@ export default () => {
                     state.posts = posts;
                     watchedState.feeds = feeds;
                   })
-                  .catch(() => {
+                  .catch((error) => {
+                    const catchEl = document.querySelector('.catch');
+                    catchEl.textContent = error.message;
                     watchedState.form.state.status = i18n.t('form.status.networkError');
                   });
               }
