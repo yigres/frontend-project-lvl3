@@ -19,7 +19,7 @@ const state = {
   posts: [],
 };
 
-const FeedExists = (value) => {
+const feedExists = (value) => {
   let result = false;
   state.feeds.forEach(({ url }) => {
     if (url === value) {
@@ -142,34 +142,43 @@ export default () => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const url = form.querySelector('input').value;
+        state.form.state.url = url;
+
         const urlEl = document.querySelector('.url');
         urlEl.textContent = url;
+        console.log(`url=${url}`);
 
-        if (FeedExists(url)) {
-          watchedState.form.state.valid = false;
-          watchedState.form.state.status = i18n.t('form.status.duplicated');
-        }
-        if (!FeedExists(url)) {
-          schema
-            .isValid({
-              website: url,
-            })
-            .then((valid) => {
-              const check = document.querySelector('.check');
-              check.textContent = valid;
+        const feedExistsEl = document.querySelector('.feedExists');
+        feedExistsEl.textContent = feedExists(url);
+        console.log(`feedExists=${feedExistsEl.textContent}`);
 
-              state.form.state.url = url;
-              if (valid === false) {
-                state.form.state.valid = false;
-                watchedState.form.state.status = i18n.t('form.status.invalid');
+        schema
+          .isValid({
+            website: url,
+          })
+          .then((valid) => {
+            const validEl = document.querySelector('.valid');
+            validEl.textContent = valid;
+            console.log(`valid=${valid}`);
+
+            if (valid === false) {
+              state.form.state.valid = false;
+              watchedState.form.state.status = i18n.t('form.status.invalid');
+            }
+            if (valid === true) {
+              if (feedExists(url)) {
+                watchedState.form.state.valid = false;
+                watchedState.form.state.status = i18n.t('form.status.duplicated');
               }
-              if (valid === true) {
+              if (!feedExists(url)) {
                 state.form.state.valid = true;
                 watchedState.form.state.status = i18n.t('form.status.loading');
                 fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
                   .then((response) => {
                     const responseEl = document.querySelector('.response');
                     responseEl.textContent = response.ok;
+                    console.log(`responseOk=${responseEl.textContent}`);
+
                     if (response.ok) {
                       watchedState.form.state.status = i18n.t('form.status.loaded');
                       return response.json();
@@ -180,6 +189,8 @@ export default () => {
                   .then((data) => {
                     const dataEl = document.querySelector('.data');
                     dataEl.textContent = data;
+                    console.log(`data=${data}`);
+
                     const { feeds, posts } = parser(data, url, state.feeds, state.posts);
                     state.posts = posts;
                     watchedState.feeds = feeds;
@@ -188,16 +199,16 @@ export default () => {
                     watchedState.form.state.status = i18n.t('form.status.networkError');
                   });
               }
-            })
-            .catch((error) => {
-              const catchEl = document.querySelector('.catch');
-              catchEl.textContent = error.message;
-              // watchedState.form.state.status = i18n.t('form.status.validationError');
-              const feedback = document.querySelector('.feedback');
-              feedback.textContent = error.message;
-              console.log(feedback);
-            });
-        }
+            }
+          })
+          .catch((error) => {
+            const catchEl = document.querySelector('.catch');
+            catchEl.textContent = error.message;
+            // watchedState.form.state.status = i18n.t('form.status.validationError');
+            const feedback = document.querySelector('.feedback');
+            feedback.textContent = error.message;
+            console.log(feedback);
+          });
       });
 
       const modalEl = document.getElementById('previewModal');
