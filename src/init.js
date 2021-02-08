@@ -153,9 +153,13 @@ export default () => {
         console.log(`feedExists=${feedExistsEl.textContent}`);
 
         const schemaEl = document.querySelector('.schema');
-        schemaEl.textContent = schema;
-        console.log(`schema=${schema}`);
+        schema.isValid({
+          website: url,
+        }).then((valid) => { schemaEl.textContent = valid; });
 
+        schema.isValid({
+          website: url,
+        }).then((valid) => { console.log(`valid=${valid}`); });
         schema
           .isValid({
             website: url,
