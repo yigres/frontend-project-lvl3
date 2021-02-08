@@ -190,17 +190,17 @@ export default () => {
                     state.posts = posts;
                     watchedState.feeds = feeds;
                   })
-                  .catch((error) => {
-                    const catchEl = document.querySelector('.catch');
-                    catchEl.textContent = error.message;
+                  .catch(() => {
                     watchedState.form.state.status = i18n.t('form.status.networkError');
                   });
               }
             })
             .catch((error) => {
+              const catchEl = document.querySelector('.catch');
+              catchEl.textContent = error.message;
               // watchedState.form.state.status = i18n.t('form.status.validationError');
               const feedback = document.querySelector('.feedback');
-              feedback.textContent = error.textContent;
+              feedback.textContent = error.message;
               console.log(feedback);
             });
         }
