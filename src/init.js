@@ -3,6 +3,7 @@
 
 import i18n from 'i18next';
 import * as yup from 'yup';
+import 'isomorphic-fetch';
 
 import view from './view.js';
 
