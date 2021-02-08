@@ -152,6 +152,10 @@ export default () => {
         feedExistsEl.textContent = feedExists(url);
         console.log(`feedExists=${feedExistsEl.textContent}`);
 
+        const schemaEl = document.querySelector('.schema');
+        schemaEl.textContent = schema;
+        console.log(`schema=${schema}`);
+
         schema
           .isValid({
             website: url,
