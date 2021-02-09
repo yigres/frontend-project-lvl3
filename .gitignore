@@ -4,3 +4,6 @@ dist
 assets
 temp
 yarn.lock
+jest.setup.js
+__fixtures__
+__tests__
