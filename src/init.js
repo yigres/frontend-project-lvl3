@@ -154,21 +154,23 @@ export default () => {
         console.log(`feedExists=${feedExistsEl.textContent}`);
 
         const schemaEl = document.querySelector('.schema');
-        schema.isValid({
-          website: url,
-        }).then((valid) => { schemaEl.textContent = valid; });
+        schemaEl.textContent = schema;
+        // schema.isValid({
+        //   website: url,
+        // }).then((valid) => { schemaEl.textContent = valid; });
 
-        schema.isValid({
-          website: url,
-        }).then((valid) => { console.log(`valid=${valid}`); });
+        // schema.isValid({
+        //   website: url,
+        // }).then((valid) => { console.log(`valid=${valid}`); });
+
         schema
           .isValid({
             website: url,
           })
           .then((valid) => {
             const validEl = document.querySelector('.valid');
-            validEl.textContent = valid;
-            console.log(`valid=${valid}`);
+            validEl.textContent = 'VALID!!!';
+            console.log(`valid=${validEl.textContent}`);
 
             if (valid === false) {
               state.form.state.valid = false;
