@@ -84,6 +84,8 @@ const view = (state) => {
   const watchedState = onChange(state, (path, value) => {
     if (path === 'form.state.status') {
       const submit = document.querySelector('button[type=submit]');
+      const borderElement = document.querySelector('input');
+      const feedbackEl = document.querySelector('.feedback');
 
       if (value === 'loading...') {
         submit.disabled = true;
@@ -91,14 +93,12 @@ const view = (state) => {
         submit.disabled = false;
       }
 
-      const borderElement = document.querySelector('input');
       if (state.form.state.valid === false) {
         borderElement.classList.add('is-invalid');
       }
       if (state.form.state.valid === true) {
         borderElement.classList.remove('is-invalid');
       }
-      const feedbackEl = document.querySelector('.feedback');
 
       if (value === 'Rss has been loaded') {
         const form = document.querySelector('form');
@@ -107,16 +107,13 @@ const view = (state) => {
         feedbackEl.classList.remove('text-danger');
         feedbackEl.classList.add('text-success');
       }
+
       if (value !== 'Rss has been loaded') {
         feedbackEl.classList.add('text-danger');
       }
-      // console.log(value);
-      // console.log(feedbackEl.textContent);
       feedbackEl.textContent = value;
-      // const form = document.querySelector('form');
-      // feedbackEl.textContent = form.querySelector('input').value;
-      // console.log(value);
-      // console.log(feedbackEl.textContent);
+      console.log(`value(view)=${value}`);
+      console.log(`feedbackEl.textContent=${feedbackEl.textContent}`);
     }
     if (path === 'feeds') {
       viewFeeds(state);

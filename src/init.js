@@ -113,9 +113,11 @@ export default () => {
   const schema = yup.object().shape({
     website: yup.string().url(),
   });
-  console.log(schema);
+  // console.log(schema);
 
   const form = document.querySelector('form');
+
+  // const isRss = (data) => data.status.content_type.indexOf('rss') !== (-1);
 
   i18n.init({
     lng: 'en',
@@ -131,7 +133,10 @@ export default () => {
               networkError: 'Network error or bad url',
               validationError: 'Validation error',
               i18nextError: 'Something went wrong with i18next initialization',
-              nonRssUrl: 'This source doesn\'t contain valid rss', // This source doesn't contain valid rss
+              badResponse: 'Network response was not ok',
+              // statusNotExists: 'Status is not found in http response',
+              // contentTypeNotExists: 'Content type is not found in http response',
+              nonRss: 'This source doesn\'t contain valid rss',
               loading: 'loading...',
             },
           },
@@ -155,13 +160,6 @@ export default () => {
 
         const schemaEl = document.querySelector('.schema');
         schemaEl.textContent = schema;
-        // schema.isValid({
-        //   website: url,
-        // }).then((valid) => { schemaEl.textContent = valid; });
-
-        // schema.isValid({
-        //   website: url,
-        // }).then((valid) => { console.log(`valid=${valid}`); });
 
         schema
           .isValid({
@@ -169,7 +167,7 @@ export default () => {
           })
           .then((valid) => {
             const validEl = document.querySelector('.valid');
-            validEl.textContent = 'VALID!!!';
+            validEl.textContent = valid;
             console.log(`valid=${validEl.textContent}`);
 
             if (valid === false) {
@@ -189,27 +187,35 @@ export default () => {
                     const responseEl = document.querySelector('.response');
                     responseEl.textContent = response.ok;
                     console.log(`responseOk=${responseEl.textContent}`);
-
+                    // response.text().then((contents) => console.log(`contents=${contents}`));
                     if (response.ok) {
-                      watchedState.form.state.status = i18n.t('form.status.loaded');
                       return response.json();
                     }
 
-                    throw new Error('Network response was not ok.');
+                    throw new Error(i18n.t('form.status.badResponse'));
                   })
                   .then((data) => {
                     const dataEl = document.querySelector('.data');
                     dataEl.textContent = data;
-                    console.log(`data=${data}`);
+                    console.log(data);
 
-                    const { feeds, posts } = parser(data, url, state.feeds, state.posts);
-                    state.posts = posts;
-                    watchedState.feeds = feeds;
+                    const { contents } = data;
+                    if (!contents || typeof contents !== 'string') {
+                      throw new Error(i18n.t('form.status.nonRss'));
+                    }
+                    if (contents.indexOf('rss ') === (-1)) {
+                      throw new Error(i18n.t('form.status.nonRss'));
+                    } else {
+                      const { feeds, posts } = parser(data, url, state.feeds, state.posts);
+                      state.posts = posts;
+                      watchedState.feeds = feeds;
+                      watchedState.form.state.status = i18n.t('form.status.loaded');
+                    }
                   })
                   .catch((error) => {
-                    const catchEl = document.querySelector('.catch');
-                    catchEl.textContent = error.message;
-                    watchedState.form.state.status = i18n.t('form.status.networkError');
+                    // const catchEl = document.querySelector('.catch');
+                    // catchEl.textContent = error.message;
+                    watchedState.form.state.status = error.message;
                   });
               }
             }
