@@ -7,19 +7,7 @@ import 'isomorphic-fetch';
 
 import view from './view.js';
 
-const state = {
-  form: {
-    state: {
-      valid: null,
-      url: null,
-      status: null,
-    },
-  },
-  feeds: [],
-  posts: [],
-};
-
-const feedExists = (value) => {
+const feedExists = (value, state) => {
   let result = false;
   state.feeds.forEach(({ url }) => {
     if (url === value) {
@@ -68,7 +56,7 @@ const parser = (data, url, oldFeeds, oldPosts) => {
   return { feeds, posts };
 };
 // ***************
-const checkFeeds = (watchedState) => {
+const checkFeeds = (watchedState, state) => {
   state.feeds.forEach((feed) => {
     fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feed.url)}`)
       .then((response) => {
@@ -108,6 +96,18 @@ const checkFeeds = (watchedState) => {
 };
 
 export default () => {
+  const state = {
+    form: {
+      state: {
+        valid: null,
+        url: null,
+        status: null,
+      },
+    },
+    feeds: [],
+    posts: [],
+  };
+
   const watchedState = view(state);
 
   const schema = yup.object().shape({
@@ -155,7 +155,7 @@ export default () => {
         console.log(`url=${url}`);
 
         const feedExistsEl = document.querySelector('.feedExists');
-        feedExistsEl.textContent = feedExists(url);
+        feedExistsEl.textContent = feedExists(url, state);
         console.log(`feedExists=${feedExistsEl.textContent}`);
 
         const schemaEl = document.querySelector('.schema');
@@ -175,11 +175,11 @@ export default () => {
               watchedState.form.state.status = i18n.t('form.status.invalid');
             }
             if (valid === true) {
-              if (feedExists(url)) {
+              if (feedExists(url, state)) {
                 watchedState.form.state.valid = false;
                 watchedState.form.state.status = i18n.t('form.status.duplicated');
               }
-              if (!feedExists(url)) {
+              if (!feedExists(url, state)) {
                 state.form.state.valid = true;
                 watchedState.form.state.status = i18n.t('form.status.loading');
                 fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
@@ -248,7 +248,7 @@ export default () => {
 
       setTimeout(function tick() {
         setTimeout(tick, 5000);
-        checkFeeds(watchedState);
+        checkFeeds(watchedState, state);
       }, 5000);
     })
     .catch(() => {
