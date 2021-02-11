@@ -99,7 +99,6 @@ export default () => {
   const state = {
     form: {
       state: {
-        valid: null,
         url: null,
         status: null,
       },
@@ -107,17 +106,11 @@ export default () => {
     feeds: [],
     posts: [],
   };
-
   const watchedState = view(state);
-
+  const form = document.querySelector('form');
   const schema = yup.object().shape({
     website: yup.string().url(),
   });
-  // console.log(schema);
-
-  const form = document.querySelector('form');
-
-  // const isRss = (data) => data.status.content_type.indexOf('rss') !== (-1);
 
   i18n.init({
     lng: 'en',
@@ -127,9 +120,9 @@ export default () => {
         translation: {
           form: {
             status: {
-              loaded: 'Rss has been loaded',
-              invalid: 'Must be valid url',
-              duplicated: 'Rss already exists',
+              rssLoaded: 'Rss has been loaded',
+              invalidUrl: 'Must be valid url',
+              duplicatedUrl: 'Rss already exists',
               networkError: 'Network error or bad url',
               validationError: 'Validation error',
               i18nextError: 'Something went wrong with i18next initialization',
@@ -150,80 +143,51 @@ export default () => {
         const url = form.querySelector('input').value;
         state.form.state.url = url;
 
-        const urlEl = document.querySelector('.url');
-        urlEl.textContent = url;
         console.log(`url=${url}`);
-
-        const feedExistsEl = document.querySelector('.feedExists');
-        feedExistsEl.textContent = feedExists(url, state);
-        console.log(`feedExists=${feedExistsEl.textContent}`);
-
-        const schemaEl = document.querySelector('.schema');
-        schemaEl.textContent = schema;
 
         schema
           .isValid({
             website: url,
           })
           .then((valid) => {
-            const validEl = document.querySelector('.valid');
-            validEl.textContent = valid;
-            console.log(`valid=${validEl.textContent}`);
+            console.log(`valid=${valid}`);
 
-            if (valid === false) {
-              state.form.state.valid = false;
-              watchedState.form.state.status = i18n.t('form.status.invalid');
-            }
-            if (valid === true) {
-              if (feedExists(url, state)) {
-                watchedState.form.state.valid = false;
-                watchedState.form.state.status = i18n.t('form.status.duplicated');
-              }
-              if (!feedExists(url, state)) {
-                state.form.state.valid = true;
-                watchedState.form.state.status = i18n.t('form.status.loading');
-                fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-                  .then((response) => {
-                    const responseEl = document.querySelector('.response');
-                    responseEl.textContent = response.ok;
-                    console.log(`responseOk=${responseEl.textContent}`);
-                    // response.text().then((contents) => console.log(`contents=${contents}`));
-                    if (response.ok) {
-                      return response.json();
-                    }
+            if (!valid) {
+              watchedState.form.state.status = i18n.t('form.status.invalidUrl');
+            } else if (feedExists(url, state)) {
+              watchedState.form.state.status = i18n.t('form.status.duplicatedUrl');
+            } else {
+              watchedState.form.state.status = i18n.t('form.status.loading');
+              fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+                .then((response) => {
+                  if (response.ok) {
+                    return response.json();
+                  }
 
-                    throw new Error(i18n.t('form.status.badResponse'));
-                  })
-                  .then((data) => {
-                    const dataEl = document.querySelector('.data');
-                    dataEl.textContent = data;
-                    console.log(data);
+                  throw new Error(i18n.t('form.status.badResponse'));
+                })
+                .then((data) => {
+                  console.log(data);
 
-                    const { contents } = data;
-                    if (!contents || typeof contents !== 'string') {
-                      throw new Error(i18n.t('form.status.nonRss'));
-                    }
-                    if (contents.indexOf('rss ') === (-1)) {
-                      throw new Error(i18n.t('form.status.nonRss'));
-                    } else {
-                      const { feeds, posts } = parser(data, url, state.feeds, state.posts);
-                      state.posts = posts;
-                      watchedState.feeds = feeds;
-                      watchedState.form.state.status = i18n.t('form.status.loaded');
-                    }
-                  })
-                  .catch((error) => {
-                    // const catchEl = document.querySelector('.catch');
-                    // catchEl.textContent = error.message;
-                    watchedState.form.state.status = error.message;
-                  });
-              }
+                  const { contents } = data;
+                  if (!contents || typeof contents !== 'string') {
+                    throw new Error(i18n.t('form.status.nonRss'));
+                  }
+                  if (contents.indexOf('rss ') === (-1)) {
+                    throw new Error(i18n.t('form.status.nonRss'));
+                  } else {
+                    const { feeds, posts } = parser(data, url, state.feeds, state.posts);
+                    state.posts = posts;
+                    watchedState.feeds = feeds;
+                    watchedState.form.state.status = i18n.t('form.status.rssLoaded');
+                  }
+                })
+                .catch((error) => {
+                  watchedState.form.state.status = error.message;
+                });
             }
           })
           .catch((error) => {
-            const catchEl = document.querySelector('.catch');
-            catchEl.textContent = error.message;
-            // watchedState.form.state.status = i18n.t('form.status.validationError');
             const feedback = document.querySelector('.feedback');
             feedback.textContent = error.message;
             console.log(feedback);

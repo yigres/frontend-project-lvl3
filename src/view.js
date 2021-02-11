@@ -93,14 +93,13 @@ const view = (state) => {
         submit.disabled = false;
       }
 
-      if (state.form.state.valid === false) {
+      if (value !== 'Rss has been loaded') {
         borderElement.classList.add('is-invalid');
-      }
-      if (state.form.state.valid === true) {
-        borderElement.classList.remove('is-invalid');
+        feedbackEl.classList.add('text-danger');
       }
 
       if (value === 'Rss has been loaded') {
+        borderElement.classList.remove('is-invalid');
         const form = document.querySelector('form');
 
         form.querySelector('input').value = '';
@@ -108,13 +107,12 @@ const view = (state) => {
         feedbackEl.classList.add('text-success');
       }
 
-      if (value !== 'Rss has been loaded') {
-        feedbackEl.classList.add('text-danger');
-      }
       feedbackEl.textContent = value;
+
       console.log(`value(view)=${value}`);
       console.log(`feedbackEl.textContent=${feedbackEl.textContent}`);
     }
+
     if (path === 'feeds') {
       viewFeeds(state);
       viewPosts(state, watchedState);
