@@ -63,7 +63,7 @@ const checkFeeds = (watchedState, state) => {
         if (response.ok) {
           return response.json();
         }
-        throw new Error('Network response was not ok.');
+        throw new Error(i18n.t('form.status.networkError'));
       })
       .then((data) => {
         const { posts } = parser(data, feed.url, [], []);
@@ -89,8 +89,8 @@ const checkFeeds = (watchedState, state) => {
           }
         });
       })
-      .catch(() => {
-        watchedState.form.state.status = i18n.t('form.status.networkError');
+      .catch((error) => {
+        watchedState.form.state.status = error.message;
       });
   });
 };
@@ -120,17 +120,13 @@ export default () => {
         translation: {
           form: {
             status: {
-              rssLoaded: 'Rss has been loaded',
+              i18nextError: 'Something went wrong with i18next initialization',
               invalidUrl: 'Must be valid url',
               duplicatedUrl: 'Rss already exists',
-              networkError: 'Network error or bad url',
-              validationError: 'Validation error',
-              i18nextError: 'Something went wrong with i18next initialization',
-              badResponse: 'Network response was not ok',
-              // statusNotExists: 'Status is not found in http response',
-              // contentTypeNotExists: 'Content type is not found in http response',
-              nonRss: 'This source doesn\'t contain valid rss',
               loading: 'loading...',
+              networkError: 'Network error',
+              nonRss: 'This source doesn\'t contain valid rss',
+              rssLoaded: 'Rss has been loaded',
             },
           },
         },
@@ -164,17 +160,14 @@ export default () => {
                     return response.json();
                   }
 
-                  throw new Error(i18n.t('form.status.badResponse'));
+                  throw new Error();
                 })
                 .then((data) => {
                   console.log(data);
 
                   const { contents } = data;
-                  if (!contents || typeof contents !== 'string') {
-                    throw new Error(i18n.t('form.status.nonRss'));
-                  }
-                  if (contents.indexOf('rss ') === (-1)) {
-                    throw new Error(i18n.t('form.status.nonRss'));
+                  if (!contents || typeof contents !== 'string' || contents.indexOf('rss ') === (-1)) {
+                    watchedState.form.state.status = i18n.t('form.status.nonRss');
                   } else {
                     const { feeds, posts } = parser(data, url, state.feeds, state.posts);
                     state.posts = posts;
@@ -182,15 +175,13 @@ export default () => {
                     watchedState.form.state.status = i18n.t('form.status.rssLoaded');
                   }
                 })
-                .catch((error) => {
-                  watchedState.form.state.status = error.message;
+                .catch(() => {
+                  watchedState.form.state.status = i18n.t('form.status.networkError');
                 });
             }
           })
           .catch((error) => {
-            const feedback = document.querySelector('.feedback');
-            feedback.textContent = error.message;
-            console.log(feedback);
+            watchedState.form.state.status = error.message;
           });
       });
 
