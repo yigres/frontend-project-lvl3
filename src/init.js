@@ -5,11 +5,7 @@ import 'isomorphic-fetch';
 
 import { proxyUrl, initialState, i18nOptions } from './constants';
 import createWatchedState from './state.js';
-import {
-  RssError,
-  parseResponse,
-  handleResponse,
-} from './utils';
+import { RssError, parseResponse, handleResponse } from './utils';
 
 const init = (options = {}) => {
   const { update = false } = options;
