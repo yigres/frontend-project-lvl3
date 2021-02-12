@@ -13,8 +13,8 @@ import {
 
 const unreadPostsRegExp = /^posts\.(\d+)\.unread$/;
 
-const createWatchedState = (state) => {
-  const watchedState = onChange(state, (path, value) => {
+const createWatchedState = (initialState) => {
+  const state = onChange(initialState, (path, value) => {
     switch (path) {
       case 'form.state.status': {
         renderFormStatus(value);
@@ -22,7 +22,7 @@ const createWatchedState = (state) => {
       }
 
       case 'feeds': {
-        const { feeds } = watchedState;
+        const { feeds } = state;
         const renderedFeedsCount = getRenderedFeedsCount();
         if (renderedFeedsCount === 0) {
           renderFeedsHeader();
@@ -35,7 +35,7 @@ const createWatchedState = (state) => {
       }
 
       case 'posts': {
-        const { posts } = watchedState;
+        const { posts } = state;
         const renderedPostsCount = getRenderedPostsCount();
         if (renderedPostsCount === 0) {
           renderPostsHeader();
@@ -52,7 +52,7 @@ const createWatchedState = (state) => {
       default: {
         const unreadMatch = path.match(unreadPostsRegExp);
         if (unreadMatch) {
-          const { posts } = watchedState;
+          const { posts } = state;
           const postIndex = Number(unreadMatch[1]);
           const post = posts[postIndex];
           renderPostAsUnread(post);
@@ -62,7 +62,7 @@ const createWatchedState = (state) => {
     }
   });
 
-  return watchedState;
+  return state;
 };
 
 export default createWatchedState;
