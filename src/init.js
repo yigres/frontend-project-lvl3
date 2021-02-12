@@ -36,7 +36,7 @@ const updateFeeds = (state) => {
   });
 };
 
-export default () => {
+const init = () => {
   const state = createWatchedState(initialState);
   const { state: formState } = state.form;
 
@@ -95,17 +95,17 @@ export default () => {
     modal.querySelector('div a').href = link;
   };
 
-  return i18n.init(i18nOptions)
-    .then(() => {
-      form.addEventListener('submit', onFormSubmit);
-      modalEl.addEventListener('show.bs.modal', onModalShow);
-      const tick = () => {
-        updateFeeds(state);
-        setTimeout(tick, 5000);
-      };
-      tick();
-    })
-    .catch(() => {
-      formState.status = 'i18nextError';
-    });
+  return i18n.init(i18nOptions).then(() => {
+    form.addEventListener('submit', onFormSubmit);
+    modalEl.addEventListener('show.bs.modal', onModalShow);
+    const tick = () => {
+      updateFeeds(state);
+      setTimeout(tick, 5000);
+    };
+    tick();
+  }).catch(() => {
+    formState.status = 'i18nextError';
+  });
 };
+
+export default init;

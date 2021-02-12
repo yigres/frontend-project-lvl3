@@ -4,6 +4,10 @@ export class RssError extends Error {}
 
 const generateId = (obj) => objectHash(obj).substr(0, 8);
 
+export const domReady = () => new Promise((resolve) => {
+  document.addEventListener('DOMContentLoaded', () => resolve);
+});
+
 const parseFeedsFromResponseData = (data) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(data.contents, 'text/xml');
