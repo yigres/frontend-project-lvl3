@@ -1,5 +1,7 @@
 import en from './translations/en.json';
 
+export const proxyUrl = 'https://hexlet-allorigins.herokuapp.com';
+
 export const initialState = {
   form: {
     state: {

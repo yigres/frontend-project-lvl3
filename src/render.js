@@ -74,5 +74,4 @@ export const renderFormStatus = (status) => {
   }
 
   feedbackEl.textContent = i18n.t(`form.status.${status}`);
-  console.log(`feedbackEl.textContent=${feedbackEl.textContent}`);
 };
