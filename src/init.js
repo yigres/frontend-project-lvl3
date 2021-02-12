@@ -36,7 +36,7 @@ const updateFeeds = (state) => {
   });
 };
 
-export default () => {
+const init = () => {
   const state = createWatchedState(initialState);
   const { state: formState } = state.form;
 
@@ -53,35 +53,32 @@ export default () => {
     const url = form.querySelector('input').value;
     formState.url = url;
 
-    schema.isValid({ website: url }).then((valid) => {
-      if (!valid) {
-        formState.status = 'invalidUrl';
-      } else if (feedExists(url, state)) {
-        formState.status = 'duplicatedUrl';
-      } else {
-        formState.status = 'loading';
-        fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-          .then(parseResponse)
-          .then(handleResponse)
-          .then(({ feed, posts, status }) => {
-            if (feed && typeof feed === 'object' && Array.isArray(posts)) {
-              state.feeds.push({ ...feed, url });
-              state.posts.push(...posts);
-            }
-            formState.status = status;
-          })
-          .catch((error) => {
-            if (error instanceof RssError) {
-              formState.status = error.message;
-            } else {
-              console.log(error);
-              formState.status = 'commonError';
-            }
-          });
-      }
-    }).catch((error) => {
-      formState.status = error.message;
-    });
+    const valid = schema.isValidSync({ website: url });
+    if (!valid) {
+      formState.status = 'invalidUrl';
+    } else if (feedExists(url, state)) {
+      formState.status = 'duplicatedUrl';
+    } else {
+      formState.status = 'loading';
+      fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+        .then(parseResponse)
+        .then(handleResponse)
+        .then(({ feed, posts, status }) => {
+          if (feed && typeof feed === 'object' && Array.isArray(posts)) {
+            state.feeds.push({ ...feed, url });
+            state.posts.push(...posts);
+          }
+          formState.status = status;
+        })
+        .catch((error) => {
+          if (error instanceof RssError) {
+            formState.status = error.message;
+          } else {
+            console.log(error);
+            formState.status = 'commonError';
+          }
+        });
+    }
   };
 
   const onModalShow = (event) => {
@@ -95,17 +92,17 @@ export default () => {
     modal.querySelector('div a').href = link;
   };
 
-  return i18n.init(i18nOptions)
-    .then(() => {
-      form.addEventListener('submit', onFormSubmit);
-      modalEl.addEventListener('show.bs.modal', onModalShow);
-      const tick = () => {
-        updateFeeds(state);
-        setTimeout(tick, 5000);
-      };
-      tick();
-    })
-    .catch(() => {
-      formState.status = 'i18nextError';
-    });
+  return i18n.init(i18nOptions).then(() => {
+    form.addEventListener('submit', onFormSubmit);
+    modalEl.addEventListener('show.bs.modal', onModalShow);
+    const tick = () => {
+      updateFeeds(state);
+      setTimeout(tick, 5000);
+    };
+    tick();
+  }).catch(() => {
+    formState.status = 'i18nextError';
+  });
 };
+
+export default init;
