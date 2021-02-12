@@ -7,7 +7,7 @@
       "loading": "loading...",
       "commonError": "Common error",
       "networkError": "Network error",
-      "nonRss": "This source doesn\"t contain valid rss",
+      "nonRss": "This source doesn't contain valid rss",
       "rssLoaded": "Rss has been loaded"
     }
   }
