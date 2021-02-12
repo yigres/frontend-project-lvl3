@@ -5,7 +5,11 @@ export class RssError extends Error {}
 const generateId = (obj) => objectHash(obj).substr(0, 8);
 
 export const domReady = () => new Promise((resolve) => {
-  document.addEventListener('DOMContentLoaded', () => resolve);
+  if (document.readyState === 'complete' || document.readyState === 'loaded') {
+    resolve();
+  } else {
+    document.addEventListener('DOMContentLoaded', resolve);
+  }
 });
 
 const parseFeedsFromResponseData = (data) => {
