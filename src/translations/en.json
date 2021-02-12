@@ -1,0 +1,14 @@
+{
+  "form": {
+    "status": {
+      "i18nextError": "Something went wrong with i18next initialization",
+      "invalidUrl": "Must be valid url",
+      "duplicatedUrl": "Rss already exists",
+      "loading": "loading...",
+      "commonError": "Common error",
+      "networkError": "Network error",
+      "nonRss": "This source doesn\"t contain valid rss",
+      "rssLoaded": "Rss has been loaded"
+    }
+  }
+}

@@ -7,3 +7,4 @@ yarn.lock
 jest.setup.js
 __fixtures__
 __tests__
+.idea
