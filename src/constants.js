@@ -13,7 +13,7 @@ export const initialState = {
 
 export const i18nOptions = {
   lng: 'en',
-  debug: true,
+  debug: false,
   resources: {
     en: {
       translation: en,
