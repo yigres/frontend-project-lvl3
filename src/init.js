@@ -53,35 +53,32 @@ const init = () => {
     const url = form.querySelector('input').value;
     formState.url = url;
 
-    schema.isValid({ website: url }).then((valid) => {
-      if (!valid) {
-        formState.status = 'invalidUrl';
-      } else if (feedExists(url, state)) {
-        formState.status = 'duplicatedUrl';
-      } else {
-        formState.status = 'loading';
-        fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-          .then(parseResponse)
-          .then(handleResponse)
-          .then(({ feed, posts, status }) => {
-            if (feed && typeof feed === 'object' && Array.isArray(posts)) {
-              state.feeds.push({ ...feed, url });
-              state.posts.push(...posts);
-            }
-            formState.status = status;
-          })
-          .catch((error) => {
-            if (error instanceof RssError) {
-              formState.status = error.message;
-            } else {
-              console.log(error);
-              formState.status = 'commonError';
-            }
-          });
-      }
-    }).catch((error) => {
-      formState.status = error.message;
-    });
+    const valid = schema.isValidSync({ website: url });
+    if (!valid) {
+      formState.status = 'invalidUrl';
+    } else if (feedExists(url, state)) {
+      formState.status = 'duplicatedUrl';
+    } else {
+      formState.status = 'loading';
+      fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+        .then(parseResponse)
+        .then(handleResponse)
+        .then(({ feed, posts, status }) => {
+          if (feed && typeof feed === 'object' && Array.isArray(posts)) {
+            state.feeds.push({ ...feed, url });
+            state.posts.push(...posts);
+          }
+          formState.status = status;
+        })
+        .catch((error) => {
+          if (error instanceof RssError) {
+            formState.status = error.message;
+          } else {
+            console.log(error);
+            formState.status = 'commonError';
+          }
+        });
+    }
   };
 
   const onModalShow = (event) => {
