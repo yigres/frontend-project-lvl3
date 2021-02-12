@@ -55,21 +55,21 @@ export const renderPostAsUnread = (post) => {
 
 export const renderFormStatus = (status) => {
   const submit = document.querySelector('button[type=submit]');
-  const borderElement = document.querySelector('input');
+  const inputEl = document.querySelector('input');
   const feedbackEl = document.querySelector('.feedback');
 
   submit.disabled = status === 'loading';
 
-  if (status === 'duplicatedUrl') {
-    borderElement.classList.add('is-invalid');
+  if (status !== 'loading' && status !== 'rssLoaded') {
+    inputEl.classList.add('is-invalid');
     feedbackEl.classList.add('text-danger');
   } else {
-    borderElement.classList.remove('is-invalid');
-    const form = document.querySelector('form');
-
-    form.querySelector('input').value = '';
+    inputEl.classList.remove('is-invalid');
     feedbackEl.classList.remove('text-danger');
     feedbackEl.classList.add('text-success');
+    if (status === 'rssLoaded') {
+      inputEl.value = '';
+    }
   }
 
   feedbackEl.textContent = i18n.t(`form.status.${status}`);
