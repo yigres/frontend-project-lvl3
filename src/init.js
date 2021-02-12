@@ -1,212 +1,111 @@
-/* eslint no-param-reassign:
-    ["error", { "props": true, "ignorePropertyModificationsFor": ["watchedState"] }] */
-
 import i18n from 'i18next';
 import * as yup from 'yup';
 import 'isomorphic-fetch';
 
-import view from './view.js';
+import { initialState, i18nOptions } from './constants';
+import createWatchedState from './state.js';
+import {
+  RssError,
+  parseResponse,
+  handleResponse,
+} from './utils';
 
-const feedExists = (value, state) => {
-  let result = false;
-  state.feeds.forEach(({ url }) => {
-    if (url === value) {
-      result = true;
-    }
-  });
+const feedExists = (url, state) => state.feeds.find((feed) => feed.url === url) || false;
 
-  return result;
-};
-
-// ***************
-const parser = (data, url, oldFeeds, oldPosts) => {
-  const clonedArray = (arr) => JSON.parse(JSON.stringify(arr));
-
-  const feeds = clonedArray(oldFeeds);
-  const posts = clonedArray(oldPosts);
-  const dom = new DOMParser();
-  const doc = dom.parseFromString(data.contents, 'text/xml');
-  const feedName = doc.querySelector('title').textContent;
-  const feedDescription = doc.querySelector('description').textContent;
-  const feedId = oldFeeds.length + 1;
-  const items = doc.querySelectorAll('item');
-
-  for (let i = 1; i <= items.length; i += 1) {
-    const item = items[items.length - i];
-    const name = item.querySelector('title').textContent;
-    const description = item.querySelector('description').textContent;
-    const link = item.querySelector('link').textContent;
-    posts.push({
-      postId: oldPosts.length + i,
-      feedId,
-      name,
-      description,
-      link,
-      unread: true,
-    });
-  }
-
-  feeds.push({
-    feedId,
-    name: feedName,
-    description: feedDescription,
-    url,
-  });
-
-  return { feeds, posts };
-};
-// ***************
-const checkFeeds = (watchedState, state) => {
-  state.feeds.forEach((feed) => {
-    fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feed.url)}`)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+const updateFeeds = (state) => {
+  const { form, feeds } = state;
+  const { state: formState } = form;
+  feeds.forEach(({ url }) => {
+    fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+      .then(parseResponse)
+      .then(handleResponse)
+      .then(({ feed, posts, status }) => {
+        if (feed && typeof feed === 'object' && Array.isArray(posts)) {
+          const { posts: existingPosts } = state;
+          posts.forEach((post) => {
+            if (!existingPosts.find((existingPost) => existingPost.id === post.id)) {
+              existingPosts.push(post);
+            }
+          });
         }
-        throw new Error(i18n.t('form.status.networkError'));
-      })
-      .then((data) => {
-        const { posts } = parser(data, feed.url, [], []);
-        const newPosts = posts.map((newPost) => ({
-          name: newPost.name,
-          description: newPost.description,
-          link: newPost.link,
-        }));
-        const oldPostUrls = state.posts
-          .filter((postValue) => postValue.feedId === feed.feedId)
-          .map((postValue) => postValue.link);
-        newPosts.forEach((newPost) => {
-          if (oldPostUrls.indexOf(newPost.link) === (-1)) {
-            const postId = state.posts.length + 1;
-            watchedState.posts.push({
-              postId,
-              feedId: feed.feedId,
-              name: newPost.name,
-              description: newPost.description,
-              link: newPost.link,
-              unread: true,
-            });
-          }
-        });
+        formState.status = status;
       })
       .catch((error) => {
-        watchedState.form.state.status = error.message;
+        formState.status = error.message;
       });
   });
 };
 
 export default () => {
-  const state = {
-    form: {
-      state: {
-        url: null,
-        status: null,
-      },
-    },
-    feeds: [],
-    posts: [],
-  };
-  const watchedState = view(state);
-  const form = document.querySelector('form');
+  const state = createWatchedState(initialState);
+  const { state: formState } = state.form;
+
   const schema = yup.object().shape({
     website: yup.string().url(),
   });
 
-  i18n.init({
-    lng: 'en',
-    debug: true,
-    resources: {
-      en: {
-        translation: {
-          form: {
-            status: {
-              i18nextError: 'Something went wrong with i18next initialization',
-              invalidUrl: 'Must be valid url',
-              duplicatedUrl: 'Rss already exists',
-              loading: 'loading...',
-              networkError: 'Network error',
-              nonRss: 'This source doesn\'t contain valid rss',
-              rssLoaded: 'Rss has been loaded',
-            },
-          },
-        },
-      },
-    },
-  })
-    .then(() => {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const url = form.querySelector('input').value;
-        state.form.state.url = url;
+  const form = document.querySelector('form');
+  const modalEl = document.getElementById('previewModal');
 
-        console.log(`url=${url}`);
+  const onFormSubmit = (event) => {
+    event.preventDefault();
 
-        schema
-          .isValid({
-            website: url,
-          })
-          .then((valid) => {
-            console.log(`valid=${valid}`);
+    const url = form.querySelector('input').value;
+    formState.url = url;
 
-            if (!valid) {
-              watchedState.form.state.status = i18n.t('form.status.invalidUrl');
-            } else if (feedExists(url, state)) {
-              watchedState.form.state.status = i18n.t('form.status.duplicatedUrl');
-            } else {
-              watchedState.form.state.status = i18n.t('form.status.loading');
-              fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-                .then((response) => {
-                  if (response.ok) {
-                    return response.json();
-                  }
-
-                  throw new Error();
-                })
-                .then((data) => {
-                  console.log(data);
-
-                  const { contents } = data;
-                  if (!contents || typeof contents !== 'string' || contents.indexOf('rss ') === (-1)) {
-                    watchedState.form.state.status = i18n.t('form.status.nonRss');
-                  } else {
-                    const { feeds, posts } = parser(data, url, state.feeds, state.posts);
-                    state.posts = posts;
-                    watchedState.feeds = feeds;
-                    watchedState.form.state.status = i18n.t('form.status.rssLoaded');
-                  }
-                })
-                .catch(() => {
-                  watchedState.form.state.status = i18n.t('form.status.networkError');
-                });
+    schema.isValid({ website: url }).then((valid) => {
+      if (!valid) {
+        formState.status = 'invalidUrl';
+      } else if (feedExists(url, state)) {
+        formState.status = 'duplicatedUrl';
+      } else {
+        formState.status = 'loading';
+        fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+          .then(parseResponse)
+          .then(handleResponse)
+          .then(({ feed, posts, status }) => {
+            if (feed && typeof feed === 'object' && Array.isArray(posts)) {
+              state.feeds.push({ ...feed, url });
+              state.posts.push(...posts);
             }
+            formState.status = status;
           })
           .catch((error) => {
-            watchedState.form.state.status = error.message;
+            if (error instanceof RssError) {
+              formState.status = error.message;
+            } else {
+              console.log(error);
+              formState.status = 'commonError';
+            }
           });
-      });
+      }
+    }).catch((error) => {
+      formState.status = error.message;
+    });
+  };
 
-      const modalEl = document.getElementById('previewModal');
+  const onModalShow = (event) => {
+    const { id } = event.relatedTarget.dataset;
+    const post = state.posts.find((item) => item.id === id);
+    post.unread = false;
+    const { name, description, link } = post;
+    const modal = event.target;
+    modal.querySelector('.modal-title').textContent = name;
+    modal.querySelector('.modal-body').textContent = description;
+    modal.querySelector('div a').href = link;
+  };
 
-      modalEl.addEventListener('show.bs.modal', (event) => {
-        const { id } = event.relatedTarget.dataset;
-        const {
-          name,
-          description,
-          link,
-        } = state.posts[id - 1];
-        const modal = event.target;
-        modal.querySelector('.modal-title').textContent = name;
-        modal.querySelector('.modal-body').textContent = description;
-        modal.querySelector('div a').href = link;
-        watchedState.posts[id - 1].unread = false;
-      });
-
-      setTimeout(function tick() {
+  return i18n.init(i18nOptions)
+    .then(() => {
+      form.addEventListener('submit', onFormSubmit);
+      modalEl.addEventListener('show.bs.modal', onModalShow);
+      const tick = () => {
+        updateFeeds(state);
         setTimeout(tick, 5000);
-        checkFeeds(watchedState, state);
-      }, 5000);
+      };
+      tick();
     })
     .catch(() => {
-      watchedState.form.state.status = i18n.t('form.status.i18nextError');
+      formState.status = 'i18nextError';
     });
 };
