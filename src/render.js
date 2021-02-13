@@ -63,6 +63,7 @@ export const renderFormStatus = (status) => {
   if (status !== 'loading' && status !== 'rssLoaded') {
     inputEl.classList.add('is-invalid');
     feedbackEl.classList.add('text-danger');
+    feedbackEl.classList.remove('text-success');
   } else {
     inputEl.classList.remove('is-invalid');
     feedbackEl.classList.remove('text-danger');
@@ -73,5 +74,4 @@ export const renderFormStatus = (status) => {
   }
 
   feedbackEl.textContent = i18n.t(`form.status.${status}`);
-  console.log(`feedbackEl.textContent=${feedbackEl.textContent}`);
 };

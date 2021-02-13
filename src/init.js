@@ -1,66 +1,71 @@
 import i18n from 'i18next';
 import * as yup from 'yup';
+import cloneDeep from 'lodash/cloneDeep';
 import 'isomorphic-fetch';
 
-import { initialState, i18nOptions } from './constants';
+import { proxyUrl, initialState, i18nOptions } from './constants';
 import createWatchedState from './state.js';
-import {
-  RssError,
-  parseResponse,
-  handleResponse,
-} from './utils';
+import { RssError, parseResponse, handleResponse } from './utils';
 
-const feedExists = (url, state) => state.feeds.find((feed) => feed.url === url) || false;
+const init = (options = {}) => {
+  const { update = false } = options;
 
-const updateFeeds = (state) => {
-  const { form, feeds } = state;
-  const { state: formState } = form;
-  feeds.forEach(({ url }) => {
-    fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-      .then(parseResponse)
-      .then(handleResponse)
-      .then(({ feed, posts, status }) => {
-        if (feed && typeof feed === 'object' && Array.isArray(posts)) {
-          const { posts: existingPosts } = state;
-          posts.forEach((post) => {
-            if (!existingPosts.find((existingPost) => existingPost.id === post.id)) {
-              existingPosts.push(post);
-            }
-          });
-        }
-        formState.status = status;
-      })
-      .catch((error) => {
-        formState.status = error.message;
-      });
-  });
-};
-
-const init = () => {
-  const state = createWatchedState(initialState);
+  const state = createWatchedState(cloneDeep(initialState));
   const { state: formState } = state.form;
 
   const schema = yup.object().shape({
     website: yup.string().url(),
   });
 
-  const form = document.querySelector('form');
+  const formEl = document.querySelector('form');
   const modalEl = document.getElementById('previewModal');
+
+  const handleResponseError = (error) => {
+    if (error instanceof Error && /reason: no internet/.test(error.message)) {
+      formState.status = 'networkError';
+    } else if (error instanceof RssError) {
+      formState.status = error.message;
+    } else {
+      formState.status = 'commonError';
+    }
+  };
+
+  const feedExists = (url) => state.feeds.find((feed) => feed.url === url) || false;
+
+  const updateFeeds = () => {
+    state.feeds.forEach(({ url }) => {
+      fetch(`${proxyUrl}/get?disableCache=true&url=${encodeURIComponent(url)}`)
+        .then(parseResponse)
+        .then(handleResponse)
+        .then(({ feed, posts, status }) => {
+          if (feed && typeof feed === 'object' && Array.isArray(posts)) {
+            const { posts: existingPosts } = state;
+            posts.forEach((post) => {
+              if (!existingPosts.find((existingPost) => existingPost.id === post.id)) {
+                existingPosts.push(post);
+              }
+            });
+          }
+          formState.status = status;
+        })
+        .catch(handleResponseError);
+    });
+  };
 
   const onFormSubmit = (event) => {
     event.preventDefault();
 
-    const url = form.querySelector('input').value;
+    const url = formEl.querySelector('input').value;
     formState.url = url;
 
     const valid = schema.isValidSync({ website: url });
     if (!valid) {
       formState.status = 'invalidUrl';
-    } else if (feedExists(url, state)) {
+    } else if (feedExists(url)) {
       formState.status = 'duplicatedUrl';
     } else {
       formState.status = 'loading';
-      fetch(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+      fetch(`${proxyUrl}/get?disableCache=true&url=${encodeURIComponent(url)}`)
         .then(parseResponse)
         .then(handleResponse)
         .then(({ feed, posts, status }) => {
@@ -70,14 +75,7 @@ const init = () => {
           }
           formState.status = status;
         })
-        .catch((error) => {
-          if (error instanceof RssError) {
-            formState.status = error.message;
-          } else {
-            console.log(error);
-            formState.status = 'commonError';
-          }
-        });
+        .catch(handleResponseError);
     }
   };
 
@@ -92,14 +90,17 @@ const init = () => {
     modal.querySelector('div a').href = link;
   };
 
+  formEl.addEventListener('submit', onFormSubmit);
+  modalEl.addEventListener('show.bs.modal', onModalShow);
+
   return i18n.init(i18nOptions).then(() => {
-    form.addEventListener('submit', onFormSubmit);
-    modalEl.addEventListener('show.bs.modal', onModalShow);
-    const tick = () => {
-      updateFeeds(state);
-      setTimeout(tick, 5000);
-    };
-    tick();
+    if (update) {
+      const tick = () => {
+        updateFeeds();
+        setTimeout(tick, 5000);
+      };
+      tick();
+    }
   }).catch(() => {
     formState.status = 'i18nextError';
   });

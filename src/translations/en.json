@@ -6,6 +6,7 @@
       "duplicatedUrl": "Rss already exists",
       "loading": "loading...",
       "commonError": "Common error",
+      "parseError": "Response parse error",
       "networkError": "Network error",
       "nonRss": "This source doesn't contain valid rss",
       "rssLoaded": "Rss has been loaded"
