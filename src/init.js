@@ -1,16 +1,27 @@
 import i18n from 'i18next';
 import * as yup from 'yup';
-import cloneDeep from 'lodash/cloneDeep';
+// import cloneDeep from 'lodash/cloneDeep';
 import 'isomorphic-fetch';
 
-import { proxyUrl, initialState, i18nOptions } from './constants';
+import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
 import { RssError, parseResponse, handleResponse } from './utils';
 
 const init = (options = {}) => {
+  const initialState = {
+    form: {
+      state: {
+        url: null,
+        status: null,
+      },
+    },
+    feeds: [],
+    posts: [],
+  };
+
   const { update = false } = options;
 
-  const state = createWatchedState(cloneDeep(initialState));
+  const state = createWatchedState(initialState);
   const { state: formState } = state.form;
 
   const schema = yup.object().shape({
