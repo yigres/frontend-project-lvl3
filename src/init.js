@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import * as yup from 'yup';
-// import cloneDeep from 'lodash/cloneDeep';
 import 'isomorphic-fetch';
 
 import { proxyUrl, i18nOptions } from './constants';
