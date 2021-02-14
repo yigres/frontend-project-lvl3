@@ -60,6 +60,12 @@ export const renderFormStatus = (status) => {
 
   submit.disabled = status === 'loading';
 
+  if (status === 'loading') {
+    inputEl.setAttribute('readOnly', true);
+  } else {
+    inputEl.removeAttribute('readOnly');
+  }
+
   if (status !== 'loading' && status !== 'rssLoaded') {
     inputEl.classList.add('is-invalid');
     feedbackEl.classList.add('text-danger');
