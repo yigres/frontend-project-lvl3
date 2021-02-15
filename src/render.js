@@ -29,7 +29,7 @@ export const renderNewPost = (post, clickHandler) => {
   postLiEl.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
   const linkEl = document.createElement('a');
   linkEl.href = link;
-  linkEl.classList.add('fw-bold');
+  linkEl.classList.add('font-weight-bold');
   linkEl.target = '_blank';
   linkEl.dataset.id = id;
   linkEl.rel = 'noopener noreferrer';
@@ -37,10 +37,11 @@ export const renderNewPost = (post, clickHandler) => {
   postLiEl.append(linkEl);
   const previewButton = document.createElement('button');
   previewButton.type = 'button';
+  previewButton.setAttribute('aria-label', 'preview');
   previewButton.classList.add('btn', 'btn-primary');
   previewButton.dataset.id = id;
-  previewButton.dataset.bsToggle = 'modal';
-  previewButton.dataset.bsTarget = '#previewModal';
+  previewButton.dataset.toggle = 'modal';
+  previewButton.dataset.target = '#modal';
   previewButton.textContent = 'Preview';
   postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);
@@ -49,8 +50,8 @@ export const renderNewPost = (post, clickHandler) => {
 
 export const renderPostAsUnread = (post) => {
   const linkEl = document.querySelector(`.posts > ul > li > a[data-id="${post.id}"]`);
-  linkEl.classList.remove('fw-bold');
-  linkEl.classList.add('fw-normal');
+  linkEl.classList.remove('font-weight-bold');
+  linkEl.classList.add('font-weight-normal');
 };
 
 export const renderFormStatus = (status) => {
