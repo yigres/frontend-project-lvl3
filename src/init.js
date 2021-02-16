@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import * as yup from 'yup';
 import 'isomorphic-fetch';
+import 'bootstrap';
 
 import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
@@ -28,8 +29,7 @@ const init = (options = {}) => {
   });
 
   const formEl = document.querySelector('form');
-  const modalEl = document.getElementById('modal');
-  console.log(modalEl);
+  const modalEl = document.querySelector('#previewModal');
   const handleResponseError = (error) => {
     if (error instanceof Error && /reason: no internet/.test(error.message)) {
       formState.status = 'networkError';
@@ -64,7 +64,6 @@ const init = (options = {}) => {
 
   const onFormSubmit = (event) => {
     event.preventDefault();
-    console.log('Click submit!!!');
     const url = formEl.querySelector('input').value;
     formState.url = url;
 
@@ -90,12 +89,10 @@ const init = (options = {}) => {
   };
 
   const onModalShow = (event) => {
-    console.log('Click modal!!!');
     const { id } = event.relatedTarget.dataset;
     const post = state.posts.find((item) => item.id === id);
     post.unread = false;
     const { name, description, link } = post;
-    console.log(name, description, link);
     const modal = event.target;
     modal.querySelector('.modal-title').textContent = name;
     modal.querySelector('.modal-body').textContent = description;
