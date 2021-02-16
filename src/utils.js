@@ -1,7 +1,5 @@
 import objectHash from 'object-hash';
 
-export class RssError extends Error {}
-
 const generateId = (obj) => objectHash(obj).substr(0, 8);
 
 export const domReady = () => new Promise((resolve) => {
@@ -40,9 +38,9 @@ const parseFeedsFromResponseData = (data) => {
 
 export const parseResponse = (response) => {
   if (!response.ok) {
-    return Promise.reject(new RssError('networkError'));
+    return Promise.reject(new Error('responseError'));
   }
-  return response.json().catch(() => Promise.reject(new RssError('parseError')));
+  return response.json().catch(() => Promise.reject(new Error('parseError')));
 };
 
 export const handleResponse = (data) => {
