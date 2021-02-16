@@ -5,7 +5,7 @@ import 'bootstrap';
 
 import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
-import { RssError, parseResponse, handleResponse } from './utils';
+import { parseResponse, handleResponse } from './utils';
 
 const init = (options = {}) => {
   const initialState = {
@@ -33,7 +33,7 @@ const init = (options = {}) => {
   const handleResponseError = (error) => {
     if (error instanceof Error && /reason: no internet/.test(error.message)) {
       formState.status = 'networkError';
-    } else if (error instanceof RssError) {
+    } else if (['responseError', 'parseError'].includes(error.message)) {
       formState.status = error.message;
     } else {
       formState.status = 'commonError';
