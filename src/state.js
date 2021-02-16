@@ -27,10 +27,12 @@ const createWatchedState = (initialState) => {
         if (renderedFeedsCount === 0) {
           renderFeedsHeader();
         }
-        for (let i = renderedFeedsCount; i < feeds.length; i += 1) {
-          const feed = feeds[i];
-          renderNewFeed(feed);
-        }
+        feeds.forEach((feed, i) => {
+          if (i >= renderedFeedsCount && i < feeds.length) {
+            const newFeed = feeds[i];
+            renderNewFeed(newFeed);
+          }
+        });
         break;
       }
 
@@ -40,12 +42,14 @@ const createWatchedState = (initialState) => {
         if (renderedPostsCount === 0) {
           renderPostsHeader();
         }
-        for (let i = renderedPostsCount; i < posts.length; i += 1) {
-          const post = posts[i];
-          renderNewPost(post, () => {
-            post.unread = false;
-          });
-        }
+        posts.forEach((post, i) => {
+          if (i >= renderedPostsCount && i < posts.length) {
+            const newPost = posts[i];
+            renderNewPost(newPost, () => {
+              newPost.unread = false;
+            });
+          }
+        });
         break;
       }
 
