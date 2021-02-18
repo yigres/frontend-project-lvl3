@@ -1,3 +1,7 @@
+## 2.1.0 (2021-02-18)
+
+- refactored state
+
 ## 2.0.1 (2021-02-18)
 
 - added ru.json for translation
