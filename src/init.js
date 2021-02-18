@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import 'isomorphic-fetch';
 import 'bootstrap';
 
-import { proxyUrl, i18nOptionsEn, i18nOptionsRu } from './constants';
+import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
 import { parseResponse, handleResponse } from './utils';
 
@@ -101,12 +101,8 @@ const init = (options = { language: 'ru' }) => {
 
   formEl.addEventListener('submit', onFormSubmit);
   modalEl.addEventListener('show.bs.modal', onModalShow);
-  let i18nOptions = i18nOptionsEn;
-  if (language === 'ru') {
-    i18nOptions = i18nOptionsRu;
-  }
 
-  return i18n.init(i18nOptions).then(() => {
+  return i18n.init({ ...i18nOptions, lng: language }).then(() => {
     if (update) {
       const tick = () => {
         updateFeeds();

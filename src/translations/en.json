@@ -13,7 +13,13 @@
       "rssLoaded": "Rss has been loaded"
     }
   },
-  "feeds": "Feeds",
-  "posts": "Posts",
-  "preview": "Preview"
+  "feeds": {
+    "title": "Feeds"
+  },
+  "posts": {
+    "title": "Posts"
+  },
+  "buttons": {
+    "preview": "Preview"
+  }
 }

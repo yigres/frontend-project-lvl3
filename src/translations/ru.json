@@ -13,7 +13,13 @@
       "rssLoaded": "RSS успешно загружен"
     }
   },
-  "feeds": "Фиды",
-  "posts": "Посты",
-  "preview": "Просмотр"
+  "feeds": {
+    "title": "Фиды"
+  },
+  "posts": {
+    "title": "Посты"
+  },
+  "buttons": {
+    "preview": "Просмотр"
+  }
 }
