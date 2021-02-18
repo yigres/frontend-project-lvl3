@@ -1,4 +1,5 @@
 import objectHash from 'object-hash';
+import i18n from 'i18next';
 
 const generateId = (obj) => objectHash(obj).substr(0, 8);
 
@@ -9,6 +10,16 @@ export const domReady = () => new Promise((resolve) => {
     document.addEventListener('DOMContentLoaded', resolve);
   }
 });
+
+let i18nInitialized = false;
+export const initI18n = (options) => {
+  if (i18nInitialized) {
+    return Promise.resolve();
+  }
+  return i18n.init(options).then(() => {
+    i18nInitialized = true;
+  });
+};
 
 const parseFeedsFromResponseData = (data) => {
   const dom = new DOMParser();
