@@ -16,7 +16,7 @@ const unreadPostsRegExp = /^posts\.(\d+)\.unread$/;
 const createWatchedState = (initialState) => {
   const state = onChange(initialState, (path, value) => {
     switch (path) {
-      case 'form.state.status': {
+      case 'status': {
         renderFormStatus(value);
         break;
       }

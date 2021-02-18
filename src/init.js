@@ -8,12 +8,8 @@ import { initI18n, parseResponse, handleResponse } from './utils';
 
 const init = (options = {}) => {
   const initialState = {
-    form: {
-      state: {
-        url: null,
-        status: null,
-      },
-    },
+    url: null,
+    status: null,
     feeds: [],
     posts: [],
   };
@@ -21,7 +17,6 @@ const init = (options = {}) => {
   const { language = 'ru', update = false } = options;
 
   const state = createWatchedState(initialState);
-  const { state: formState } = state.form;
 
   const schema = yup.object().shape({
     website: yup.string().url(),
@@ -31,11 +26,11 @@ const init = (options = {}) => {
   const modalEl = document.querySelector('#previewModal');
   const handleResponseError = (error) => {
     if (error instanceof Error && /reason: no internet/.test(error.message)) {
-      formState.status = 'networkError';
+      state.status = 'networkError';
     } else if (['responseError', 'parseError'].includes(error.message)) {
-      formState.status = error.message;
+      state.status = error.message;
     } else {
-      formState.status = 'commonError';
+      state.status = 'commonError';
     }
   };
 
@@ -55,7 +50,7 @@ const init = (options = {}) => {
               }
             });
           }
-          formState.status = status;
+          state.status = status;
         })
         .catch(handleResponseError);
     });
@@ -64,15 +59,15 @@ const init = (options = {}) => {
   const onFormSubmit = (event) => {
     event.preventDefault();
     const url = formEl.querySelector('input').value;
-    formState.url = url;
+    state.url = url;
 
     const valid = schema.isValidSync({ website: url });
     if (!valid) {
-      formState.status = 'invalidUrl';
+      state.status = 'invalidUrl';
     } else if (feedExists(url)) {
-      formState.status = 'duplicatedUrl';
+      state.status = 'duplicatedUrl';
     } else {
-      formState.status = 'loading';
+      state.status = 'loading';
       fetch(`${proxyUrl}/get?disableCache=true&url=${encodeURIComponent(url)}`)
         .then(parseResponse)
         .then(handleResponse)
@@ -81,7 +76,7 @@ const init = (options = {}) => {
             state.feeds.push({ ...feed, url });
             state.posts.push(...posts);
           }
-          formState.status = status;
+          state.status = status;
         })
         .catch(handleResponseError);
     }
@@ -110,7 +105,7 @@ const init = (options = {}) => {
       tick();
     }
   }).catch(() => {
-    formState.status = 'i18nextError';
+    state.status = 'i18nextError';
   });
 };
 
