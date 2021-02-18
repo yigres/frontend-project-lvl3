@@ -7,7 +7,7 @@ import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
 import { parseResponse, handleResponse } from './utils';
 
-const init = (options = { language: 'ru' }) => {
+const init = (options = {}) => {
   const initialState = {
     form: {
       state: {
