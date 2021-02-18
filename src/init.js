@@ -3,11 +3,11 @@ import * as yup from 'yup';
 import 'isomorphic-fetch';
 import 'bootstrap';
 
-import { proxyUrl, i18nOptions } from './constants';
+import { proxyUrl, i18nOptionsEn, i18nOptionsRu } from './constants';
 import createWatchedState from './state.js';
 import { parseResponse, handleResponse } from './utils';
 
-const init = (options = {}) => {
+const init = (options = { language: 'ru' }) => {
   const initialState = {
     form: {
       state: {
@@ -19,7 +19,7 @@ const init = (options = {}) => {
     posts: [],
   };
 
-  const { update = false } = options;
+  const { language = 'ru', update = false } = options;
 
   const state = createWatchedState(initialState);
   const { state: formState } = state.form;
@@ -101,6 +101,10 @@ const init = (options = {}) => {
 
   formEl.addEventListener('submit', onFormSubmit);
   modalEl.addEventListener('show.bs.modal', onModalShow);
+  let i18nOptions = i18nOptionsEn;
+  if (language === 'ru') {
+    i18nOptions = i18nOptionsRu;
+  }
 
   return i18n.init(i18nOptions).then(() => {
     if (update) {

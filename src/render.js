@@ -5,12 +5,12 @@ export const getRenderedPostsCount = () => document.querySelectorAll('.posts > u
 
 export const renderFeedsHeader = () => {
   const feedsEl = document.querySelector('.feeds');
-  feedsEl.innerHTML = '<h2>Feeds</h2><ul class="list-group mb-5"></ul>';
+  feedsEl.innerHTML = `<h2>${i18n.t('feeds')}</h2><ul class="list-group mb-5"></ul>`;
 };
 
 export const renderPostsHeader = () => {
   const postsEl = document.querySelector('.posts');
-  postsEl.innerHTML = '<h2>Posts</h2><ul class="list-group"></ul>';
+  postsEl.innerHTML = `<h2>${i18n.t('posts')}</h2><ul class="list-group"></ul>`;
 };
 
 export const renderNewFeed = (feed) => {
@@ -41,7 +41,7 @@ export const renderNewPost = (post, clickHandler) => {
   previewButton.dataset.id = id;
   previewButton.dataset.bsToggle = 'modal';
   previewButton.dataset.bsTarget = '#previewModal';
-  previewButton.textContent = 'Preview';
+  previewButton.textContent = i18n.t('preview');
   postLiEl.append(previewButton);
   postsUlEl.prepend(postLiEl);
   linkEl.addEventListener('click', clickHandler);

@@ -1,0 +1,19 @@
+{
+  "form": {
+    "status": {
+      "i18nextError": "Что-то пошло не так с i18next инициализацией",
+      "invalidUrl": "Ссылка должна быть валидным URL",
+      "duplicatedUrl": "RSS уже существует",
+      "loading": "Загрузка...",
+      "commonError": "Общая ошибка",
+      "responseError": "Ошибка ответа",
+      "parseError": "Ошибка разбора ответа",
+      "networkError": "Ошибка сети",
+      "nonRss": "Ресурс не содержит валидный RSS",
+      "rssLoaded": "RSS успешно загружен"
+    }
+  },
+  "feeds": "Фиды",
+  "posts": "Посты",
+  "preview": "Просмотр"
+}

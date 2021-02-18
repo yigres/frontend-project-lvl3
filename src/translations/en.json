@@ -12,5 +12,8 @@
       "nonRss": "This source doesn't contain valid rss",
       "rssLoaded": "Rss has been loaded"
     }
-  }
+  },
+  "feeds": "Feeds",
+  "posts": "Posts",
+  "preview": "Preview"
 }
