@@ -103,6 +103,7 @@ const init = (options = {}) => {
   modalEl.addEventListener('show.bs.modal', onModalShow);
 
   return i18n.init({ ...i18nOptions, lng: language }).then(() => {
+    console.log(i18n.language);
     if (update) {
       const tick = () => {
         updateFeeds();
