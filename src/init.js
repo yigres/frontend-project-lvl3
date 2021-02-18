@@ -1,11 +1,10 @@
-import i18n from 'i18next';
 import * as yup from 'yup';
 import 'isomorphic-fetch';
 import 'bootstrap';
 
 import { proxyUrl, i18nOptions } from './constants';
 import createWatchedState from './state.js';
-import { parseResponse, handleResponse } from './utils';
+import { initI18n, parseResponse, handleResponse } from './utils';
 
 const init = (options = {}) => {
   const initialState = {
@@ -102,8 +101,7 @@ const init = (options = {}) => {
   formEl.addEventListener('submit', onFormSubmit);
   modalEl.addEventListener('show.bs.modal', onModalShow);
 
-  return i18n.init({ ...i18nOptions, lng: language }).then(() => {
-    console.log(i18n.language);
+  return initI18n({ ...i18nOptions, lng: language }).then(() => {
     if (update) {
       const tick = () => {
         updateFeeds();
