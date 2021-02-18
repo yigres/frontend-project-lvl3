@@ -13,7 +13,7 @@ export const domReady = () => new Promise((resolve) => {
 
 const i18nState = { initialized: false };
 export const initI18n = (options) => {
-  if (i18n.initialized) {
+  if (i18nState.initialized) {
     return Promise.resolve();
   }
   return i18n.init(options).then(() => {
