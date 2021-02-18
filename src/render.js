@@ -78,10 +78,6 @@ export const renderFormStatus = (status) => {
       inputEl.value = '';
     }
   }
-  console.log(status);
-  console.log(i18n.t(`form:status.${status}`));
-  console.log(i18n.t(`status.${status}`, { ns: 'form' }));
-  console.log(i18n.t(`status.${status}`, { ns: 'form', lng: 'en' }));
-  console.log(i18n.t(`status.${status}`, { ns: 'form', lng: 'ru' }));
+
   feedbackEl.textContent = i18n.t(`form:status.${status}`);
 };
